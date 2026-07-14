@@ -3,6 +3,8 @@
 A kid-friendly, solar-system-themed Sudoku game for iPad. One file (`index.html`),
 no dependencies, no build step.
 
+**[Play Osudoku](https://pencilsmith.com/osudoku/)**
+
 - 8 difficulty levels from 🌑 Moon (4×4) to Black Hole (9×9), picked via the
   top-left button — every puzzle is generated fresh with exactly one solution
 - Pencil notes, cell clear, star rewards, and gentle mistake feedback (wrong
@@ -12,44 +14,12 @@ no dependencies, no build step.
 - Works offline after the first load (service worker; requires HTTPS —
   see below)
 
-## Getting it onto the iPad
+## Play on iPad
 
-### Option A — quick play over Wi-Fi (Mac must stay on)
+Open [pencilsmith.com/osudoku](https://pencilsmith.com/osudoku/) in Safari.
+The game is hosted with GitHub Pages and works anywhere.
 
-1. On the Mac, start a server in this folder:
-
-   ```sh
-   cd ~/Dev/osudoku
-   python3 -m http.server 8642
-   ```
-
-2. Find the Mac's address:
-
-   ```sh
-   ipconfig getifaddr en0
-   ```
-
-3. On the iPad (same Wi-Fi network), open Safari and go to
-   `http://<that address>:8642` — e.g. `http://192.168.1.23:8642`.
-
-The game only loads while the Mac is on the same network with the server
-running — browsers refuse to install the offline service worker over plain
-`http://` addresses — so use this for trying it out and Option B for keeps.
-
-### Option B — put it online with GitHub Pages (works anywhere, free)
-
-1. Create an empty repository on GitHub, then from this folder:
-
-   ```sh
-   git remote add origin https://github.com/<your-username>/osudoku.git
-   git push -u origin main
-   ```
-
-2. On GitHub: **Settings → Pages → Branch: `main` / root → Save**.
-3. After a minute the game is live at
-   `https://<your-username>.github.io/osudoku/` — open that on the iPad.
-
-### Make it feel like a real app (either option)
+### Make it feel like a real app
 
 In Safari on the iPad, with the game open:
 
@@ -62,16 +32,21 @@ on the iPad automatically.
 
 ## Offline play
 
-When served over HTTPS (GitHub Pages) or `localhost`, a service worker
-caches the game on the first load — after that it launches and plays with
-no internet at all (airplane mode, road trips). Updates take care of
-themselves: the next online launch downloads the new version in the
-background, and the launch after that runs it.
+The hosted game uses HTTPS, so a service worker caches it on the first load.
+After that it launches and plays with no internet at all (airplane mode, road
+trips). Updates take care of themselves: the next online launch downloads the
+new version in the background, and the launch after that runs it.
 
 To verify: load the game once online, enable Airplane Mode, and launch it
 again — it should come up instantly.
 
 ## Development
 
-Everything lives in `index.html` (styles, puzzle engine, UI). Open it via any
-static server, e.g. `python3 -m http.server 8642`.
+Everything lives in `index.html` (styles, puzzle engine, UI). There is no build
+step; clone the repository and serve it with any static server:
+
+```sh
+git clone https://github.com/jorgexun/osudoku.git
+cd osudoku
+python3 -m http.server 8642
+```
