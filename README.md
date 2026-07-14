@@ -9,6 +9,8 @@ no dependencies, no build step.
   numbers wiggle away, nothing is ever "game over")
 - An astronomically accurate solar system background with a tap-to-open
   sky guide (🔭 button)
+- Works offline after the first load (service worker; requires HTTPS —
+  see below)
 
 ## Getting it onto the iPad
 
@@ -31,7 +33,8 @@ no dependencies, no build step.
    `http://<that address>:8642` — e.g. `http://192.168.1.23:8642`.
 
 The game only loads while the Mac is on the same network with the server
-running, so use this for trying it out and Option B for keeps.
+running — browsers refuse to install the offline service worker over plain
+`http://` addresses — so use this for trying it out and Option B for keeps.
 
 ### Option B — put it online with GitHub Pages (works anywhere, free)
 
@@ -57,8 +60,16 @@ That gives it a home-screen icon and launches it full screen, without
 Safari's address bar. Progress (stars, best scores, last level) is saved
 on the iPad automatically.
 
-> Note: there is no offline support yet — the home-screen app still needs
-> to reach the server (or GitHub Pages) when it launches.
+## Offline play
+
+When served over HTTPS (GitHub Pages) or `localhost`, a service worker
+caches the game on the first load — after that it launches and plays with
+no internet at all (airplane mode, road trips). Updates take care of
+themselves: the next online launch downloads the new version in the
+background, and the launch after that runs it.
+
+To verify: load the game once online, enable Airplane Mode, and launch it
+again — it should come up instantly.
 
 ## Development
 
