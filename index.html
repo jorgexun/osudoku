@@ -10,14 +10,13 @@
 <title>Osudoku</title>
 <style>
   :root{
-    --sky:#BDE6FF;
-    --sky-deep:#8FD0F7;
     --tile:#FFFFFF;
     --tile-alt:#EAF6FF;
     --ink:#2B4A66;
     --ink-soft:#6E92AE;
     --coral:#FF6F61;
     --coral-deep:#E85446;
+    --grape:#6B46C1;
     --sun:#FFC93C;
     --mint:#4EC99B;
     --berry:#FF5D6C;
@@ -41,6 +40,7 @@
     font-family:inherit;color:inherit;border:0;background:none;cursor:pointer;
     touch-action:manipulation;
   }
+  svg{display:inline-block;vertical-align:-0.125em;}
 
   /* ---------- solar system background ----------
      Planets run in true order from the Sun (bottom-left corner), up the
@@ -181,7 +181,6 @@
     transition:transform .1s, box-shadow .1s;
   }
   .chip:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(43,74,102,.15);}
-  .chip small{font-size:13px;color:var(--ink-soft);font-weight:800;}
   #starTotal{font-size:17px;position:relative;}
   .tip{
     position:absolute;top:calc(100% + 12px);right:0;z-index:5;
@@ -215,6 +214,7 @@
   /* ---------- board ---------- */
   #board{
     display:grid;gap:8px;
+    width:min(92vw,58vh); /* fallback for Safari < 16.4 (no dvh) */
     width:min(92vw,58dvh);
     aspect-ratio:1;
   }
@@ -234,12 +234,12 @@
   .box.alt .cell{background:var(--tile-alt);}
   .cell.given{background:#D8ECFB;color:#1E3B54;font-weight:900;}
   .box.alt .cell.given{background:#CBE4F7;}
-  .cell.user{color:var(--coral-deep);}
+  .cell.user{color:var(--grape);}
   .cell.peer{background:#FFF6DC;}
   .cell.same{background:#FFE9A8;}
   .cell.sel{
-    background:#FFE1DC !important;
-    box-shadow:0 0 0 4px var(--coral), 0 3px 0 rgba(43,74,102,.14);
+    background:#EFE7FF !important;
+    box-shadow:0 0 0 4px #8B5CF6, 0 3px 0 rgba(43,74,102,.14);
     transform:scale(1.06);z-index:2;
   }
   .cell.pop span{animation:pop .35s ease-out;}
@@ -309,7 +309,7 @@
   /* ---------- landscape ---------- */
   @media (orientation:landscape){
     main{flex-direction:row;justify-content:center;gap:5vw;}
-    #board{width:min(76dvh,52vw);}
+    #board{width:min(76vh,52vw);width:min(76dvh,52vw);}
     #controls{width:auto;}
     body.s4 #pad{grid-template-columns:repeat(2,minmax(60px,84px));}
     body.s6 #pad{grid-template-columns:repeat(3,minmax(56px,78px));}
@@ -330,7 +330,8 @@
   .card{
     background:#FFFDF7;border-radius:28px;
     box-shadow:0 12px 0 rgba(43,74,102,.2);
-    padding:26px 30px;max-width:min(92vw,560px);max-height:88dvh;overflow-y:auto;
+    padding:26px 30px;max-width:min(92vw,560px);
+    max-height:88vh;max-height:88dvh;overflow-y:auto;
     text-align:center;
     transform:scale(.8);transition:transform .25s cubic-bezier(.34,1.56,.64,1);
   }
@@ -429,7 +430,7 @@
     .star,#winFace,#confetti span{animation:none !important;}
     .cell,.card,.overlay{transition:none !important;}
   }
-  :is(button,.cell):focus-visible{outline:4px solid var(--coral);outline-offset:2px;}
+  :is(button,.cell):focus-visible{outline:4px solid #8B5CF6;outline-offset:2px;}
 </style>
 </head>
 <body class="s4">
@@ -460,11 +461,11 @@
 
   <header>
     <button class="chip" id="levelBtn" aria-label="Choose level">
-      <span id="levelFace">🐻</span><span class="caret">▾</span>
+      <span id="levelFace">💥</span><span class="caret">▾</span>
     </button>
     <button class="chip" id="newBtn" aria-label="New puzzle">🎲</button>
     <h1>Osudoku</h1>
-    <button class="chip" id="starTotal" aria-describedby="starTip">⭐ <span id="starCount">0</span>
+    <button class="chip" id="starTotal" aria-describedby="starTip">⭐ <span id="starCount" aria-live="polite">0</span>
       <span class="tip" id="starTip" role="tooltip">
         <b>Your star collection!</b>
         Finish a puzzle to win stars:<br>
@@ -473,12 +474,11 @@
         ⭐ &nbsp;you did it — keep trying!
       </span>
     </button>
-    <button class="chip" id="symBtn" aria-label="Switch symbols">🐾</button>
     <button class="chip" id="sndBtn" aria-label="Sound on or off">🔊</button>
   </header>
 
   <main>
-    <div id="board" role="grid" aria-label="Sudoku board"></div>
+    <div id="board" role="group" aria-label="Sudoku board"></div>
     <div id="controls">
       <div id="pad"></div>
       <div id="actions">
@@ -500,9 +500,9 @@
 
   <div class="overlay" id="winOv">
     <div class="card">
-      <span id="winFace">🐻</span>
-      <div id="winMsg">You did it!</div>
-      <div id="winSub">The animals are cheering for you</div>
+      <span id="winFace">💥</span>
+      <div id="winMsg" aria-live="polite">You did it!</div>
+      <div id="winSub">The whole galaxy is cheering for you</div>
       <div id="winStars"></div>
       <div class="cardBtns">
         <button class="bigBtn primary" id="againBtn"><span class="em">🎲</span>Play again</button>
@@ -511,7 +511,7 @@
     </div>
   </div>
 
-  <button id="guideBtn" aria-label="What's in the sky?">🪐</button>
+  <button id="guideBtn" aria-label="What's in the sky?">🔭</button>
 
   <div class="overlay" id="guideOv">
     <div class="card" id="guideCard">
@@ -625,34 +625,80 @@ function makePuzzle(n,targetGivens){
 }
 
 /* ================= game config ================= */
+/* Hand-drawn SVG icons — accurate shapes and colors, matching the
+   background art. Emoji get the astronomy wrong (yellow crescents,
+   holes in the ground), so we draw our own.
+   Gradient ids (#gsun, …) repeat when an icon appears more than once;
+   that's safe only because every copy is identical and the first copy
+   in the DOM (the always-visible header chip) defines the paint. */
+const SVG=(inner)=>`<svg viewBox="0 0 40 40" width="1em" height="1em" aria-hidden="true">${inner}</svg>`;
+const ICONS={
+  sun:SVG(`<defs><radialGradient id="gsun" cx="40%" cy="38%" r="70%"><stop offset="0" stop-color="#FFF9D6"/><stop offset=".5" stop-color="#FFE45C"/><stop offset="1" stop-color="#FF9D2E"/></radialGradient></defs>
+    <circle cx="20" cy="20" r="18" fill="#FFC93C" opacity=".25"/><circle cx="20" cy="20" r="16" fill="#FFC93C" opacity=".25"/>
+    <circle cx="20" cy="20" r="13" fill="url(#gsun)"/>`),
+  saturn:SVG(`<defs><radialGradient id="gsat" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#F4E5BE"/><stop offset=".55" stop-color="#E2C489"/><stop offset="1" stop-color="#C7A05F"/></radialGradient></defs>
+    <circle cx="20" cy="20" r="10.5" fill="url(#gsat)"/>
+    <g transform="rotate(-19 20 20)" fill="none"><ellipse cx="20" cy="20" rx="14" ry="4" stroke="#E9D4A4" stroke-width="2.4" opacity=".95"/><ellipse cx="20" cy="20" rx="17.5" ry="5.4" stroke="#E9D4A4" stroke-width="1.6" opacity=".6"/></g>`),
+  moon:SVG(`<defs><radialGradient id="gmoo" cx="35%" cy="32%" r="75%"><stop offset="0" stop-color="#F2F0EB"/><stop offset=".55" stop-color="#C9C4BB"/><stop offset="1" stop-color="#8F897F"/></radialGradient></defs>
+    <circle cx="20" cy="20" r="13" fill="url(#gmoo)"/>
+    <circle cx="24" cy="15" r="3.2" fill="#A9A399" opacity=".8"/><circle cx="14" cy="20" r="2.4" fill="#A9A399" opacity=".7"/><circle cx="21" cy="27" r="2.8" fill="#A9A399" opacity=".75"/><circle cx="15" cy="12" r="1.6" fill="#B4AEA4" opacity=".7"/><circle cx="28" cy="23" r="1.8" fill="#B4AEA4" opacity=".6"/>`),
+  comet:SVG(`<path d="M14 23 L38 2.5 L26 29 Z" fill="#9FC4E8" opacity=".35"/>
+    <path d="M14 25 L35 8 L24 30 Z" fill="#CFE6F8" opacity=".5"/>
+    <defs><radialGradient id="gcom" cx="35%" cy="32%" r="75%"><stop offset="0" stop-color="#F4FAFF"/><stop offset=".55" stop-color="#BFD9EE"/><stop offset="1" stop-color="#7FA3C4"/></radialGradient></defs>
+    <circle cx="13" cy="27" r="5.5" fill="url(#gcom)"/>`),
+  supernova:SVG(`<g stroke="#FFD34D" stroke-width="2.2" stroke-linecap="round"><line x1="20" y1="2" x2="20" y2="7"/><line x1="20" y1="33" x2="20" y2="38"/><line x1="2" y1="20" x2="7" y2="20"/><line x1="33" y1="20" x2="38" y2="20"/><line x1="7.3" y1="7.3" x2="10.8" y2="10.8"/><line x1="29.2" y1="29.2" x2="32.7" y2="32.7"/><line x1="7.3" y1="32.7" x2="10.8" y2="29.2"/><line x1="29.2" y1="10.8" x2="32.7" y2="7.3"/></g>
+    <circle cx="20" cy="20" r="12" stroke="#FF9D2E" stroke-width="2" fill="none" opacity=".8"/>
+    <circle cx="20" cy="20" r="7" fill="#FFE45C" opacity=".55"/><circle cx="20" cy="20" r="4.5" fill="#FFF"/>`),
+  galaxy:SVG(`<g transform="rotate(-15 20 20)"><ellipse cx="20" cy="20" rx="9" ry="5.5" fill="#CFE0FF" opacity=".35"/>
+    <path d="M8 27 Q9 13 24 9.5" stroke="#BFD4FF" stroke-width="2.6" fill="none" opacity=".85" stroke-linecap="round"/>
+    <path d="M32 13 Q31 27 16 30.5" stroke="#BFD4FF" stroke-width="2.6" fill="none" opacity=".85" stroke-linecap="round"/>
+    <ellipse cx="20" cy="20" rx="4.4" ry="2.8" fill="#FFF" opacity=".95"/></g>
+    <circle cx="10" cy="12" r="1" fill="#FFF" opacity=".9"/><circle cx="31" cy="26" r="1" fill="#FFF" opacity=".9"/><circle cx="27" cy="6" r=".8" fill="#FFF" opacity=".7"/>`),
+  quasar:SVG(`<g transform="rotate(-15 20 20)"><path d="M18.4 15 L20 1.5 L21.6 15 Z" fill="#9FD4FF" opacity=".9"/><path d="M18.4 25 L20 38.5 L21.6 25 Z" fill="#9FD4FF" opacity=".9"/>
+    <ellipse cx="20" cy="20" rx="12.5" ry="4.4" fill="#FFB13D" opacity=".85"/><ellipse cx="20" cy="20" rx="6.5" ry="2.3" fill="#FFE9B0"/><circle cx="20" cy="20" r="2.4" fill="#FFF"/></g>`),
+  blackhole:SVG(`<circle cx="20" cy="20" r="10" fill="none" stroke="#FF9D2E" stroke-width="4" opacity=".85"/>
+    <path d="M11 23.5 A10 10 0 0 0 29 23.5" stroke="#FFD34D" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+    <circle cx="20" cy="20" r="7.6" fill="#05070F"/><circle cx="20" cy="20" r="7.6" fill="none" stroke="#FFE9B0" stroke-width=".7" opacity=".8"/>`),
+};
+
 const LEVELS=[
-  {face:"🐣",name:"Chick",size:4,givens:12,sz:"4 × 4"},
-  {face:"🐰",name:"Bunny",size:4,givens:8, sz:"4 × 4"},
-  {face:"🦊",name:"Fox",  size:6,givens:18,sz:"6 × 6"},
-  {face:"🐨",name:"Koala",size:9,givens:44,sz:"9 × 9"},
-  {face:"🐻",name:"Bear", size:9,givens:38,sz:"9 × 9"},
-  {face:"🦁",name:"Lion", size:9,givens:32,sz:"9 × 9"},
-  {face:"🐯",name:"Tiger",size:9,givens:28,sz:"9 × 9"},
-  {face:"🐉",name:"Dragon",size:9,givens:24,sz:"9 × 9"},
+  {icon:"moon",     name:"Moon",      size:4,givens:12,sz:"4 × 4"},
+  {icon:"comet",    name:"Comet",     size:4,givens:8, sz:"4 × 4"},
+  {icon:"saturn",   name:"Planet",    size:6,givens:18,sz:"6 × 6"},
+  {icon:"sun",      name:"Sun",       size:9,givens:44,sz:"9 × 9"},
+  {icon:"supernova",name:"Supernova", size:9,givens:38,sz:"9 × 9"},
+  {icon:"galaxy",   name:"Galaxy",    size:9,givens:32,sz:"9 × 9"},
+  {icon:"quasar",   name:"Quasar",    size:9,givens:28,sz:"9 × 9"},
+  {icon:"blackhole",name:"Black Hole",size:9,givens:24,sz:"9 × 9"},
 ];
-const ANIMALS=["🐶","🐱","🐰","🦊","🐻","🐼","🐸","🐵","🦁"];
-const PRAISE=["You did it!","Wonderful!","Super solve!","Amazing work!","Brilliant!"];
+const PRAISE=["Out of this world!","Stellar work!","Cosmic!","You did it!","Super solve!"];
 
 const store={
   data:(()=>{ try{return JSON.parse(localStorage.getItem("osudoku"))||{};}catch(e){return {};} })(),
   save(){ try{localStorage.setItem("osudoku",JSON.stringify(this.data));}catch(e){} }
 };
-store.data.best   = store.data.best   || {};
-store.data.total  = store.data.total  || 0;
-store.data.level  = store.data.level  ?? 4;
-store.data.emoji  = store.data.emoji  ?? false;
-store.data.sound  = store.data.sound  ?? true;
+/* Sanitize persisted data — a corrupted value must never brick boot.
+   Best scores are keyed by level name so reordering LEVELS keeps them. */
+{
+  const d=store.data, names=new Set(LEVELS.map(L=>L.name));
+  const best={};
+  if(d.best&&typeof d.best==="object"){
+    for(const [k,v] of Object.entries(d.best)){
+      if(names.has(k)) best[k]=Math.min(3,Math.max(0,Math.floor(Number(v)||0)));
+    }
+  }
+  d.best  = best;
+  d.total = Math.max(0,Math.floor(Number(d.total)||0));
+  d.level = LEVELS[d.level] ? d.level : 4;
+  d.sound = d.sound!==false;
+}
 
 /* ================= state ================= */
 const S={
   level:store.data.level, n:4,
   sol:[], puz:[], given:[], notes:[],
   sel:null, mistakes:0, done:false, noteMode:false,
+  epoch:0, /* bumped each newGame so stale timeouts can bail */
 };
 
 const $=id=>document.getElementById(id);
@@ -686,12 +732,11 @@ const sndErase=()=>{beep(480,0.06,"sine",0,0.1);beep(340,0.09,"sine",0.05,0.1);}
 const sndWin =()=>[523,659,784,1047,1319].forEach((f,i)=>beep(f,0.2,"triangle",i*0.11,0.2));
 
 /* ================= rendering ================= */
-function symbol(v){ return store.data.emoji ? ANIMALS[v-1] : String(v); }
-
 function buildBoard(){
   const n=S.n, {br,bc}=BOXES[n];
   const boxRows=n/br, boxCols=n/bc;
-  document.body.className="s"+n;
+  document.body.classList.remove("s4","s6","s9");
+  document.body.classList.add("s"+n);
   boardEl.innerHTML="";
   boardEl.style.gridTemplate=`repeat(${boxRows},1fr)/repeat(${boxCols},1fr)`;
   const boxes=[];
@@ -708,7 +753,6 @@ function buildBoard(){
     for(let c=0;c<n;c++){
       const el=document.createElement("button");
       el.className="cell";
-      el.setAttribute("role","gridcell");
       el.appendChild(document.createElement("span"));
       const nt=document.createElement("div");
       nt.className="notes";
@@ -732,14 +776,14 @@ window.addEventListener("resize",()=>requestAnimationFrame(fitFont));
 
 function refreshCell(r,c){
   const el=cellEls[r][c], v=S.puz[r][c];
-  el.querySelector("span").textContent = v ? symbol(v) : "";
+  el.querySelector("span").textContent = v ? v : "";
   const set=S.notes[r][c];
   [...el.querySelector(".notes").children].forEach((slot,i)=>{
-    slot.textContent = (!v && set.has(i+1)) ? symbol(i+1) : "";
+    slot.textContent = (!v && set.has(i+1)) ? i+1 : "";
   });
   el.classList.toggle("given",S.given[r][c]);
   el.classList.toggle("user",!S.given[r][c]&&v>0);
-  const label=v ? (store.data.emoji?ANIMALS[v-1]:v) : "empty";
+  const label=v || "empty";
   el.setAttribute("aria-label",`Row ${r+1} column ${c+1}: ${label}`);
 }
 
@@ -782,10 +826,10 @@ function updatePad(){
   for(let r=0;r<S.n;r++) for(let c=0;c<S.n;c++) counts[S.puz[r][c]]++;
   [...padEl.children].forEach((b,i)=>{
     const v=i+1, left=S.n-counts[v];
-    b.querySelector(".sym").textContent=symbol(v);
+    b.querySelector(".sym").textContent=v;
     b.querySelector(".cnt").textContent=left>0?left:"✓";
     b.classList.toggle("done",left<=0);
-    b.setAttribute("aria-label",`${store.data.emoji?ANIMALS[v-1]:v}, ${left} left`);
+    b.setAttribute("aria-label",`${v}, ${left} left`);
   });
 }
 
@@ -797,9 +841,9 @@ function tapCell(r,c){
 }
 
 function tapPad(v,btn){
-  if(S.done) return;
+  const flash=()=>{ btn.classList.remove("flash"); void btn.offsetWidth; btn.classList.add("flash"); sndTap(); };
+  if(S.done||!S.sel){ flash(); return; }
   const sel=S.sel;
-  if(!sel){ btn.classList.remove("flash"); void btn.offsetWidth; btn.classList.add("flash"); sndTap(); return; }
   const [r,c]=sel;
   if(S.given[r][c]||S.puz[r][c]) return;
   if(S.noteMode){
@@ -822,9 +866,11 @@ function tapPad(v,btn){
   }else{
     S.mistakes++;
     sndBad();
-    el.querySelector("span").textContent=symbol(v);
+    el.querySelector("span").textContent=v;
     el.classList.add("bad");
+    const epoch=S.epoch;
     setTimeout(()=>{
+      if(S.epoch!==epoch) return;
       el.classList.remove("bad");
       refreshCell(r,c);
     },600);
@@ -832,11 +878,10 @@ function tapPad(v,btn){
 }
 
 function eraseCell(){
-  if(S.done) return;
   const btn=$("eraseBtn");
   const sel=S.sel;
   const flash=()=>{btn.classList.remove("flash");void btn.offsetWidth;btn.classList.add("flash");sndTap();};
-  if(!sel){flash();return;}
+  if(S.done||!sel){flash();return;}
   const [r,c]=sel;
   if(S.given[r][c]||(!S.puz[r][c]&&S.notes[r][c].size===0)){flash();return;}
   S.puz[r][c]=0;
@@ -868,8 +913,8 @@ function newGame(levelIdx){
   S.sol=sol; S.puz=puz;
   S.given=puz.map(row=>row.map(v=>v>0));
   S.notes=puz.map(row=>row.map(()=>new Set()));
-  S.sel=null; S.mistakes=0; S.done=false;
-  $("levelFace").textContent=L.face;
+  S.sel=null; S.mistakes=0; S.done=false; S.epoch++;
+  $("levelFace").innerHTML=ICONS[L.icon];
   buildBoard();
   buildPad();
   refreshAll();
@@ -880,8 +925,8 @@ function checkWin(){
   for(let r=0;r<S.n;r++) for(let c=0;c<S.n;c++) if(!S.puz[r][c]) return;
   S.done=true;
   const stars=S.mistakes===0?3:S.mistakes<=2?2:1;
-  const best=store.data.best[S.level]||0;
-  store.data.best[S.level]=Math.max(best,stars);
+  const key=LEVELS[S.level].name;
+  store.data.best[key]=Math.max(store.data.best[key]||0,stars);
   store.data.total+=stars;
   store.save();
   updateStarTotal();
@@ -889,7 +934,7 @@ function checkWin(){
 }
 
 function showWin(stars){
-  $("winFace").textContent=LEVELS[S.level].face;
+  $("winFace").innerHTML=ICONS[LEVELS[S.level].icon];
   $("winMsg").textContent=PRAISE[Math.floor(Math.random()*PRAISE.length)];
   const holder=$("winStars");
   holder.innerHTML="";
@@ -942,8 +987,8 @@ function buildPicker(){
   LEVELS.forEach((L,i)=>{
     const b=document.createElement("button");
     b.className="lvl"+(i===S.level?" cur":"");
-    const best=store.data.best[i]||0;
-    b.innerHTML=`<span class="face">${L.face}</span>
+    const best=store.data.best[L.name]||0;
+    b.innerHTML=`<span class="face">${ICONS[L.icon]}</span>
       <span class="nm">${L.name}</span>
       <span class="sz">${L.sz}</span>
       <span class="best">${"⭐".repeat(best)}${"☆".repeat(3-best)}</span>`;
@@ -971,12 +1016,6 @@ $("newBtn").addEventListener("click",()=>{sndTap();newGame(S.level);});
 $("againBtn").addEventListener("click",()=>{sndTap();$("winOv").classList.remove("show");newGame(S.level);});
 $("winPickBtn").addEventListener("click",()=>{sndTap();$("winOv").classList.remove("show");buildPicker();$("pickerOv").classList.add("show");});
 
-$("symBtn").addEventListener("click",()=>{
-  store.data.emoji=!store.data.emoji; store.save();
-  $("symBtn").textContent=store.data.emoji?"123":"🐾";
-  sndTap();
-  refreshAll();
-});
 $("sndBtn").addEventListener("click",()=>{
   store.data.sound=!store.data.sound; store.save();
   $("sndBtn").textContent=store.data.sound?"🔊":"🔇";
@@ -1004,7 +1043,6 @@ document.addEventListener("pointerdown",()=>audio(),{once:true});
 })();
 
 /* ================= boot ================= */
-$("symBtn").textContent=store.data.emoji?"123":"🐾";
 $("sndBtn").textContent=store.data.sound?"🔊":"🔇";
 updateStarTotal();
 newGame(S.level);
