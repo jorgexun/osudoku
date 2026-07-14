@@ -488,9 +488,9 @@
     </div>
   </main>
 
-  <div class="overlay" id="pickerOv">
-    <div class="card">
-      <h2>Pick your challenge</h2>
+  <div class="overlay" id="pickerOv" aria-hidden="true" inert>
+    <div class="card" role="dialog" aria-modal="true" aria-labelledby="pickerTitle" tabindex="-1">
+      <h2 id="pickerTitle">Pick your challenge</h2>
       <div id="levels"></div>
       <div class="cardBtns">
         <button class="bigBtn" id="pickerClose"><span class="em">👈</span>Back</button>
@@ -498,8 +498,8 @@
     </div>
   </div>
 
-  <div class="overlay" id="winOv">
-    <div class="card">
+  <div class="overlay" id="winOv" aria-hidden="true" inert>
+    <div class="card" role="dialog" aria-modal="true" aria-labelledby="winMsg" aria-describedby="winSub" tabindex="-1">
       <span id="winFace">💥</span>
       <div id="winMsg" aria-live="polite">You did it!</div>
       <div id="winSub">The whole galaxy is cheering for you</div>
@@ -513,9 +513,9 @@
 
   <button id="guideBtn" aria-label="What's in the sky?">🔭</button>
 
-  <div class="overlay" id="guideOv">
-    <div class="card" id="guideCard">
-      <h2>What's in the sky? 🔭</h2>
+  <div class="overlay" id="guideOv" aria-hidden="true" inert>
+    <div class="card" id="guideCard" role="dialog" aria-modal="true" aria-labelledby="guideTitle" tabindex="-1">
+      <h2 id="guideTitle">What's in the sky? 🔭</h2>
       <div class="fact"><span class="dot sun"></span><span><span class="nm2">The Sun</span> — our star! About one million Earths could fit inside it.</span></div>
       <div class="fact"><span class="dot mercury"></span><span><span class="nm2">Mercury</span> — the smallest planet and the fastest: one year there lasts only 88 days.</span></div>
       <div class="fact"><span class="dot venus"></span><span><span class="nm2">Venus</span> — the hottest planet, hiding under thick golden clouds.</span></div>
@@ -533,7 +533,7 @@
     </div>
   </div>
 
-  <div id="confetti"></div>
+  <div id="confetti" aria-hidden="true"></div>
 
 <script>
 "use strict";
@@ -945,7 +945,7 @@ function showWin(stars){
     holder.appendChild(s);
     setTimeout(()=>s.classList.add("on"),400+i*350);
   }
-  $("winOv").classList.add("show");
+  openOverlay("winOv");
   sndWin();
   confetti();
 }
@@ -969,6 +969,60 @@ function confetti(){
 
 /* ================= header / overlays ================= */
 function updateStarTotal(){ $("starCount").textContent=store.data.total; }
+
+const overlayReturnFocus=new WeakMap();
+const overlayBackgroundState=new WeakMap();
+
+function openOverlay(id,initialFocus,returnFocus=document.activeElement){
+  const ov=$(id);
+  if(returnFocus instanceof HTMLElement&&!ov.contains(returnFocus)){
+    overlayReturnFocus.set(ov,returnFocus);
+  }
+  const background=[...document.body.children].filter(el=>el!==ov&&el instanceof HTMLElement);
+  overlayBackgroundState.set(ov,background.map(el=>[el,el.hasAttribute("inert")]));
+  background.forEach(el=>el.setAttribute("inert",""));
+  ov.removeAttribute("inert");
+  ov.setAttribute("aria-hidden","false");
+  ov.classList.add("show");
+  requestAnimationFrame(()=>{
+    const target=typeof initialFocus==="string"?ov.querySelector(initialFocus):initialFocus;
+    (target||ov.querySelector(".card")).focus();
+  });
+}
+
+function closeOverlay(id,{restoreFocus=true}={}){
+  const ov=$(id);
+  ov.classList.remove("show");
+  ov.setAttribute("aria-hidden","true");
+  ov.setAttribute("inert","");
+  for(const [el,wasInert] of overlayBackgroundState.get(ov)||[]){
+    if(wasInert) el.setAttribute("inert","");
+    else el.removeAttribute("inert");
+  }
+  overlayBackgroundState.delete(ov);
+  const returnFocus=overlayReturnFocus.get(ov);
+  overlayReturnFocus.delete(ov);
+  if(restoreFocus&&returnFocus?.isConnected) requestAnimationFrame(()=>returnFocus.focus());
+}
+
+document.addEventListener("keydown",e=>{
+  const ov=document.querySelector(".overlay.show");
+  if(!ov) return;
+  if(e.key==="Escape"){
+    e.preventDefault();
+    closeOverlay(ov.id);
+    return;
+  }
+  if(e.key!=="Tab") return;
+  const focusable=[...ov.querySelectorAll(
+    'button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])'
+  )].filter(el=>!el.hidden);
+  const card=ov.querySelector(".card"), active=document.activeElement;
+  if(!focusable.length){e.preventDefault();card.focus();return;}
+  const first=focusable[0],last=focusable[focusable.length-1];
+  if(e.shiftKey&&(active===first||active===card||!ov.contains(active))){e.preventDefault();last.focus();}
+  else if(!e.shiftKey&&(active===last||!ov.contains(active))){e.preventDefault();first.focus();}
+});
 
 let tipTimer=null;
 $("starTotal").addEventListener("click",()=>{
@@ -994,17 +1048,17 @@ function buildPicker(){
       <span class="best">${"⭐".repeat(best)}${"☆".repeat(3-best)}</span>`;
     b.addEventListener("click",()=>{
       sndTap();
-      $("pickerOv").classList.remove("show");
+      closeOverlay("pickerOv");
       newGame(i);
     });
     wrap.appendChild(b);
   });
 }
 
-$("guideBtn").addEventListener("click",()=>{sndTap();$("guideOv").classList.add("show");});
-$("guideClose").addEventListener("click",()=>{sndTap();$("guideOv").classList.remove("show");});
-$("levelBtn").addEventListener("click",()=>{sndTap();buildPicker();$("pickerOv").classList.add("show");});
-$("pickerClose").addEventListener("click",()=>{sndTap();$("pickerOv").classList.remove("show");});
+$("guideBtn").addEventListener("click",()=>{sndTap();openOverlay("guideOv");});
+$("guideClose").addEventListener("click",()=>{sndTap();closeOverlay("guideOv");});
+$("levelBtn").addEventListener("click",()=>{sndTap();buildPicker();openOverlay("pickerOv",".lvl.cur");});
+$("pickerClose").addEventListener("click",()=>{sndTap();closeOverlay("pickerOv");});
 $("noteBtn").addEventListener("click",()=>{
   S.noteMode=!S.noteMode;
   $("noteBtn").classList.toggle("on",S.noteMode);
@@ -1013,8 +1067,8 @@ $("noteBtn").addEventListener("click",()=>{
 });
 $("eraseBtn").addEventListener("click",eraseCell);
 $("newBtn").addEventListener("click",()=>{sndTap();newGame(S.level);});
-$("againBtn").addEventListener("click",()=>{sndTap();$("winOv").classList.remove("show");newGame(S.level);});
-$("winPickBtn").addEventListener("click",()=>{sndTap();$("winOv").classList.remove("show");buildPicker();$("pickerOv").classList.add("show");});
+$("againBtn").addEventListener("click",()=>{sndTap();closeOverlay("winOv",{restoreFocus:false});newGame(S.level);requestAnimationFrame(()=>$("levelBtn").focus());});
+$("winPickBtn").addEventListener("click",()=>{sndTap();closeOverlay("winOv",{restoreFocus:false});buildPicker();openOverlay("pickerOv",".lvl.cur",$("levelBtn"));});
 
 $("sndBtn").addEventListener("click",()=>{
   store.data.sound=!store.data.sound; store.save();

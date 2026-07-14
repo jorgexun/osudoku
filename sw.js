@@ -25,15 +25,14 @@ self.addEventListener("activate", e => {
 self.addEventListener("fetch", e => {
   const req = e.request;
   if (req.method !== "GET" || new URL(req.url).origin !== location.origin) return;
-  e.respondWith(
-    caches.match(req, { ignoreSearch: true }).then(cached => {
-      const refresh = fetch(req)
-        .then(res => {
-          if (res.ok) caches.open(CACHE).then(c => c.put(req, res.clone()));
-          return res;
-        })
-        .catch(() => cached);
-      return cached || refresh;
-    })
-  );
+  const cached = caches.match(req, { ignoreSearch: true });
+  const refresh = fetch(req).then(async res => {
+    if (res.ok) {
+      const cache = await caches.open(CACHE);
+      await cache.put(req, res.clone());
+    }
+    return res;
+  });
+  e.waitUntil(refresh.catch(() => {}));
+  e.respondWith(cached.then(hit => hit || refresh));
 });
