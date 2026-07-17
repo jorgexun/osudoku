@@ -4,7 +4,7 @@ A kid-friendly, solar-system-themed Sudoku game for iPad. The original version
 lives in one file (`index.html`), with no dependencies or build step.
 
 The repository also includes `modern.html`, a visually restrained version for
-adult players. It offers five standard 9×9 difficulty levels with the same notes,
+adult players. It offers four standard 9×9 difficulty levels with the same notes,
 scoring, sound, feedback, dialogs, saved progress, and offline support while
 replacing the space theme and playful imagery with a clean, neutral interface.
 Entries are validated against the current row, column, and box rather than the

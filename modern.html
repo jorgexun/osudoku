@@ -646,23 +646,46 @@
     #levelBtn{min-width:154px;padding-left:6px;}
     #levelBtn .levelCopy{display:flex;}
     #starTotal{min-width:58px;}
-    main{padding:10px 10px 14px;}
-    body.s9 #pad{grid-template-columns:repeat(5,minmax(48px,60px));}
+    main{padding:10px 12px 14px;}
+    .gameShell{justify-content:center;gap:clamp(10px,2dvh,16px);}
+    #controls{gap:10px;}
+  }
+
+  @media (max-width:760px) and (orientation:portrait){
+    .gameShell{gap:clamp(32px,5dvh,44px);}
+    #pad{
+      width:min(100%,328px);
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:6px;
+    }
+    .padBtn{flex:0 0 calc((100% - 24px)/5);}
+    #actions{width:min(100%,328px);gap:6px;}
+    #actions .actionBtn{flex:1;}
   }
 
   @media (max-width:470px){
     .brand{display:none;}
-    .toolbar{width:100%;margin:0;justify-content:space-between;}
-    #levelBtn{flex:1;min-width:0;max-width:164px;}
+    .headerInner{min-height:58px;padding:7px 10px;}
+    .toolbar{width:100%;margin:0;justify-content:flex-end;gap:6px;}
+    #levelBtn{flex:1;min-width:0;max-width:none;}
     #newBtn,#sndBtn{width:40px;padding:0;}
     #starTotal{padding:0 9px;}
     .toolBtn .scoreLabel{display:none;}
-    #board{width:min(94vw,53dvh,620px);}
+    main{padding:8px 12px 12px;}
+    #board{width:min(calc(100vw - 24px),53dvh,620px);}
     .padBtn .cnt{top:4px;right:4px;}
   }
 
-  @media (min-width:700px){
-    #levels{grid-template-columns:repeat(3,1fr);}
+  @media (max-width:470px) and (max-height:650px) and (orientation:portrait){
+    .headerInner{min-height:56px;padding-top:6px;padding-bottom:6px;}
+    main{padding-top:6px;padding-bottom:10px;}
+    .gameShell{gap:18px;}
+    #controls{gap:7px;}
+    #board{width:min(calc(100vw - 24px),52dvh,620px);}
+    #pad,#actions{width:min(100%,300px);}
+    .actionBtn{min-height:42px;}
   }
 
   @media (orientation:landscape){
@@ -670,6 +693,7 @@
     .gameShell{flex-direction:row;justify-content:center;gap:5vw;}
     #board{width:min(76vh,53vw,620px);width:min(76dvh,53vw,620px);}
     #controls{width:auto;max-width:390px;}
+    #pad{display:grid;}
     body.s9 #pad{grid-template-columns:repeat(3,minmax(52px,68px));}
   }
 
@@ -700,7 +724,7 @@
         <button class="toolBtn" id="levelBtn" aria-label="Choose difficulty">
           <span id="levelFace"><span class="levelMark">02</span></span>
           <span class="levelCopy">
-            <strong id="levelName">Advanced</strong>
+            <strong id="levelName">Medium</strong>
             <small id="levelSize">9 × 9</small>
           </span>
           <span class="caret" aria-hidden="true">⌄</span>
@@ -901,16 +925,14 @@ const ICONS={
   sun:marker(1),
   supernova:marker(2),
   galaxy:marker(3),
-  quasar:marker(4),
-  blackhole:marker(5)
+  blackhole:marker(4)
 };
 
 const LEVELS=[
-  {key:"Sun",icon:"sun",name:"Standard",size:9,givens:44,sz:"9 × 9"},
-  {key:"Supernova",icon:"supernova",name:"Advanced",size:9,givens:38,sz:"9 × 9"},
+  {key:"Sun",icon:"sun",name:"Easy",size:9,givens:44,sz:"9 × 9"},
+  {key:"Supernova",icon:"supernova",name:"Medium",size:9,givens:38,sz:"9 × 9"},
   {key:"Galaxy",icon:"galaxy",name:"Hard",size:9,givens:32,sz:"9 × 9"},
-  {key:"Quasar",icon:"quasar",name:"Expert",size:9,givens:28,sz:"9 × 9"},
-  {key:"Black Hole",icon:"blackhole",name:"Master",size:9,givens:24,sz:"9 × 9"}
+  {key:"Black Hole",icon:"blackhole",name:"Expert",size:9,givens:24,sz:"9 × 9"}
 ];
 
 const PRAISE=["Puzzle complete.","Solved.","Well played.","Excellent solve.","Grid complete."];
@@ -932,7 +954,10 @@ const store={
   d.best=best;
   d.total=Math.max(0,Math.floor(Number(d.total)||0));
   const legacyLevel=Number.isInteger(d.level)&&d.level>=0&&d.level<=8?d.level:5;
-  d.modernLevel=LEVELS[d.modernLevel]?d.modernLevel:Math.min(4,Math.max(0,legacyLevel-4));
+  const storedModern=Number.isInteger(d.modernLevel)?d.modernLevel:null;
+  d.modernLevel=storedModern===null
+    ?Math.min(3,Math.max(0,legacyLevel-4))
+    :Math.min(3,Math.max(0,storedModern));
   d.sound=d.sound!==false;
 }
 
