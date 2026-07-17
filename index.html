@@ -7,6 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Osudoku">
+<meta name="theme-color" content="#0D1430">
 <title>Osudoku</title>
 <style>
   :root{
@@ -23,6 +24,9 @@
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{height:100%;overflow:hidden;}
+  /* canvas behind the body — shows when the visual viewport outgrows 100dvh
+     (toolbar transitions, overscroll bounce), so keep it night-sky dark */
+  html{background:#121A3C;}
   body{
     font-family:ui-rounded,"SF Pro Rounded","Chalkboard SE","Comic Sans MS",system-ui,sans-serif;
     background:
@@ -296,8 +300,10 @@
   }
   .bigBtn:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(43,74,102,.18);}
   .bigBtn .em{font-size:24px;}
-  .bigBtn.on{background:var(--sun);color:#5A4200;box-shadow:0 5px 0 #C98F10;}
-  .bigBtn.on:active{box-shadow:0 1px 0 #C98F10;}
+  /* notes are the player's own marks — the on state speaks the same purple
+     as the selection ring (gold would also camouflage the yellow ✏️) */
+  .bigBtn.on{background:#EFE7FF;color:var(--grape);box-shadow:0 0 0 5px #8B5CF6, 0 5px 0 rgba(43,74,102,.18);}
+  .bigBtn.on:active{box-shadow:0 0 0 5px #8B5CF6, 0 1px 0 rgba(43,74,102,.18);}
   .bigBtn.flash{animation:shake .4s;}
 
   /* ---------- landscape ---------- */
