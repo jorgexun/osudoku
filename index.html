@@ -167,11 +167,7 @@
     display:flex;align-items:center;gap:10px;
     padding:10px 16px 4px;
   }
-  h1{
-    font-size:clamp(20px,3.2vmin,30px);font-weight:900;letter-spacing:.5px;
-    color:#EAF1FF;text-shadow:0 2px 12px rgba(90,140,255,.45);
-    margin-right:auto;
-  }
+  #newBtn{margin-right:auto;}
   .chip{
     display:flex;align-items:center;justify-content:center;gap:6px;
     min-width:52px;height:48px;padding:0 14px;
@@ -181,27 +177,8 @@
     transition:transform .1s, box-shadow .1s;
   }
   .chip:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(43,74,102,.15);}
-  #starTotal{font-size:17px;position:relative;}
-  .tip{
-    position:absolute;top:calc(100% + 12px);right:0;z-index:5;
-    width:240px;padding:12px 14px;border-radius:16px;
-    background:#FFFDF7;color:var(--ink);
-    box-shadow:0 6px 0 rgba(43,74,102,.18);
-    font-size:14px;font-weight:800;line-height:1.7;text-align:left;
-    opacity:0;pointer-events:none;transform:translateY(-6px) scale(.95);
-    transform-origin:top right;
-    transition:opacity .18s, transform .18s;
-  }
-  .tip b{display:block;font-size:15px;color:var(--coral-deep);margin-bottom:2px;}
-  .tip::before{
-    content:"";position:absolute;top:-7px;right:22px;
-    width:14px;height:14px;background:#FFFDF7;border-radius:3px;
-    transform:rotate(45deg);
-  }
-  @media (hover:hover){
-    #starTotal:hover .tip{opacity:1;transform:none;}
-  }
-  #starTotal.tipOpen .tip{opacity:1;transform:none;}
+  #starTotal{font-size:17px;}
+  #starRules{font-size:16px;font-weight:800;line-height:2;margin-top:6px;}
   #levelBtn .caret{font-size:12px;color:var(--ink-soft);}
 
   /* ---------- layout ---------- */
@@ -212,21 +189,24 @@
   }
 
   /* ---------- board ---------- */
+  /* --cw = board width / cells per row (set by fitFont). All board metrics
+     scale from it so 4×4 and 6×6 cells keep the 9×9 proportions. */
   #board{
-    display:grid;gap:8px;
+    display:grid;gap:calc(var(--cw,56px)*.14);
     width:min(92vw,58vh); /* fallback for Safari < 16.4 (no dvh) */
     width:min(92vw,58dvh);
     aspect-ratio:1;
   }
   .box{
-    display:grid;gap:5px;padding:5px;border-radius:16px;
+    display:grid;gap:calc(var(--cw,56px)*.09);padding:calc(var(--cw,56px)*.09);
+    border-radius:calc(var(--cw,56px)*.28);
     background:rgba(255,255,255,.10);
   }
   .box.alt{background:rgba(120,170,255,.16);}
   .cell{
     position:relative;border-radius:22%;
     background:var(--tile);
-    box-shadow:0 3px 0 rgba(43,74,102,.14);
+    box-shadow:0 calc(var(--cw,56px)*.055) 0 rgba(43,74,102,.14);
     display:flex;align-items:center;justify-content:center;
     font-size:var(--fs,24px);font-weight:800;color:var(--ink);
     transition:background .12s, transform .12s;
@@ -239,27 +219,41 @@
   .cell.same{background:#FFE9A8;}
   .cell.sel{
     background:#EFE7FF !important;
-    box-shadow:0 0 0 4px #8B5CF6, 0 3px 0 rgba(43,74,102,.14);
-    transform:scale(1.06);z-index:2;
+    box-shadow:0 0 0 calc(var(--cw,56px)*.07) #8B5CF6, 0 calc(var(--cw,56px)*.055) 0 rgba(43,74,102,.14);
+    transform:scale(1.06);z-index:30; /* above the zing wave (max 20) */
   }
   .cell.pop span{animation:pop .35s ease-out;}
   .cell.bad{background:#FFD9DE !important;color:var(--berry);animation:shake .5s;}
   .cell .notes{
-    position:absolute;inset:5%;display:grid;pointer-events:none;
+    position:absolute;inset:5%;display:grid;place-items:center;pointer-events:none;
   }
   body.s4 .notes{grid-template:repeat(2,1fr)/repeat(2,1fr);}
   body.s6 .notes{grid-template:repeat(2,1fr)/repeat(3,1fr);}
   body.s9 .notes{grid-template:repeat(3,1fr)/repeat(3,1fr);}
   .notes i{
-    font-style:normal;display:flex;align-items:center;justify-content:center;
+    /* text-box trims the line box to the digit glyphs so the grid centers
+       them optically — without it, font descender metrics push them off. */
+    font-style:normal;line-height:1;text-box:trim-both cap alphabetic;
     font-size:var(--nfs,11px);font-weight:800;color:var(--ink-soft);
   }
   .cell.bad .notes{opacity:0;}
+  .cell.zing{animation:zing .55s ease-out;} /* z-index set inline: 20 - wave distance */
+  /* gold halo lives on ::after so a cell's own box-shadow is never blended
+     toward gold; the selected cell skips it entirely — gold over its purple
+     ring would read as pink, and red/pink must stay reserved for mistakes */
+  .cell.zing:not(.sel)::after{
+    content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+    box-shadow:0 0 0 calc(var(--cw,56px)*.055) #FFE9A8, 0 0 calc(var(--cw,56px)*.33) calc(var(--cw,56px)*.11) rgba(255,211,77,.8);
+    opacity:0;animation:zingGlow .55s ease-out;animation-delay:inherit;
+  }
+  /* no 0%/100% frames: cells ease from their own look to the peak and back */
+  @keyframes zing{35%{transform:scale(1.12);filter:brightness(1.08);}}
+  @keyframes zingGlow{35%{opacity:1;}}
   @keyframes pop{0%{transform:scale(.2);}60%{transform:scale(1.25);}100%{transform:scale(1);}}
   @keyframes shake{
     0%,100%{transform:translateX(0);}
-    20%,60%{transform:translateX(-6px);}
-    40%,80%{transform:translateX(6px);}
+    20%,60%{transform:translateX(calc(var(--cw,56px)*-.11));}
+    40%,80%{transform:translateX(calc(var(--cw,56px)*.11));}
   }
 
   /* ---------- controls ---------- */
@@ -363,7 +357,7 @@
   #winStars .st.on{animation:starIn .45s cubic-bezier(.34,1.56,.64,1) forwards;}
   @keyframes starIn{to{opacity:1;transform:scale(1);}}
   #winMsg{font-size:30px;font-weight:900;color:var(--coral-deep);}
-  #winSub{font-size:16px;color:var(--ink-soft);font-weight:800;margin-top:4px;}
+  #winSub,#newSub,#starsSub{font-size:16px;color:var(--ink-soft);font-weight:800;margin-top:4px;}
   .cardBtns{display:flex;gap:12px;justify-content:center;margin-top:18px;flex-wrap:wrap;}
   .bigBtn.primary{background:var(--coral);color:#fff;box-shadow:0 5px 0 var(--coral-deep);}
   .bigBtn.primary:active{box-shadow:0 1px 0 var(--coral-deep);}
@@ -464,16 +458,7 @@
       <span id="levelFace">💥</span><span class="caret">▾</span>
     </button>
     <button class="chip" id="newBtn" aria-label="New puzzle">🎲</button>
-    <h1>Osudoku</h1>
-    <button class="chip" id="starTotal" aria-describedby="starTip">⭐ <span id="starCount" aria-live="polite">0</span>
-      <span class="tip" id="starTip" role="tooltip">
-        <b>Your star collection!</b>
-        Finish a puzzle to win stars:<br>
-        ⭐⭐⭐ &nbsp;no mistakes at all<br>
-        ⭐⭐ &nbsp;just 1 or 2 mistakes<br>
-        ⭐ &nbsp;you did it — keep trying!
-      </span>
-    </button>
+    <button class="chip" id="starTotal" aria-label="Your star collection">⭐ <span id="starCount" aria-live="polite">0</span></button>
     <button class="chip" id="sndBtn" aria-label="Sound on or off">🔊</button>
   </header>
 
@@ -507,6 +492,32 @@
       <div class="cardBtns">
         <button class="bigBtn primary" id="againBtn"><span class="em">🎲</span>Play again</button>
         <button class="bigBtn" id="winPickBtn"><span class="em">🗺️</span>Pick a level</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="starsOv" aria-hidden="true" inert>
+    <div class="card" role="dialog" aria-modal="true" aria-labelledby="starsTitle" aria-describedby="starRules" tabindex="-1">
+      <h2 id="starsTitle">Your star collection! ⭐</h2>
+      <div id="starsSub">Finish a puzzle to win stars:</div>
+      <div id="starRules">
+        ⭐⭐⭐ &nbsp;no mistakes at all<br>
+        ⭐⭐ &nbsp;just 1 or 2 mistakes<br>
+        ⭐ &nbsp;you did it — keep trying!
+      </div>
+      <div class="cardBtns">
+        <button class="bigBtn primary" id="starsClose"><span class="em">🚀</span>Got it!</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="newOv" aria-hidden="true" inert>
+    <div class="card" role="dialog" aria-modal="true" aria-labelledby="newTitle" aria-describedby="newSub" tabindex="-1">
+      <h2 id="newTitle">Start a new puzzle?</h2>
+      <div id="newSub">This one isn't finished — it will zoom away!</div>
+      <div class="cardBtns">
+        <button class="bigBtn" id="newNo"><span class="em">👈</span>Keep playing</button>
+        <button class="bigBtn primary" id="newYes"><span class="em">🎲</span>New puzzle</button>
       </div>
     </div>
   </div>
@@ -730,6 +741,7 @@ const sndPop =()=>{beep(660,0.08,"triangle");beep(990,0.1,"triangle",0.06);};
 const sndBad =()=>{beep(220,0.16,"sawtooth",0,0.1);beep(150,0.2,"sawtooth",0.1,0.09);};
 const sndErase=()=>{beep(480,0.06,"sine",0,0.1);beep(340,0.09,"sine",0.05,0.1);};
 const sndWin =()=>[523,659,784,1047,1319].forEach((f,i)=>beep(f,0.2,"triangle",i*0.11,0.2));
+const sndUnit=()=>[784,1047,1568].forEach((f,i)=>beep(f,0.12,"triangle",0.08+i*0.06,0.12));
 
 /* ================= rendering ================= */
 function buildBoard(){
@@ -769,6 +781,7 @@ function buildBoard(){
 
 function fitFont(){
   const cw=boardEl.clientWidth/S.n;
+  boardEl.style.setProperty("--cw", cw+"px");
   boardEl.style.setProperty("--fs", Math.floor(cw*0.5)+"px");
   boardEl.style.setProperty("--nfs", Math.floor(cw*(S.n===9?0.26:0.2))+"px");
 }
@@ -863,6 +876,7 @@ function tapPad(v,btn){
     updatePad();
     updateHighlights();
     checkWin();
+    celebrateUnits(r,c);
   }else{
     S.mistakes++;
     sndBad();
@@ -901,6 +915,44 @@ function clearNotesAround(r,c,v){
       if(S.notes[pr][pc].delete(v)) refreshCell(pr,pc);
     }
   }
+}
+
+/* Golden wave over each row / column / box the placed cell just completed,
+   rippling outward from (r,c). On a full win the wave still plays but the
+   sparkle sound yields to the win fanfare. */
+function celebrateUnits(r,c){
+  const n=S.n, {br,bc}=BOXES[n];
+  const r0=Math.floor(r/br)*br, c0=Math.floor(c/bc)*bc;
+  const row=[],col=[],box=[];
+  for(let i=0;i<n;i++){
+    row.push([r,i]); col.push([i,c]);
+    box.push([r0+Math.floor(i/bc), c0+i%bc]);
+  }
+  const STEP=45, delay=new Map();
+  for(const cells of [row,col,box]){
+    if(!cells.every(([cr,cc])=>S.puz[cr][cc])) continue;
+    for(const [cr,cc] of cells){
+      const k=cr*n+cc, d=Math.max(Math.abs(cr-r),Math.abs(cc-c))*STEP;
+      delay.set(k, delay.has(k)?Math.min(d,delay.get(k)):d);
+    }
+  }
+  if(!delay.size) return;
+  if(!S.done) sndUnit();
+  for(const [k,d] of delay){
+    const el=cellEls[Math.floor(k/n)][k%n];
+    el.classList.remove("zing"); void el.offsetWidth;
+    el.style.animationDelay=d+"ms";
+    el.style.zIndex=20-d/STEP; /* stable paint order: source above, receding outward */
+    el.classList.add("zing");
+  }
+  const epoch=S.epoch;
+  setTimeout(()=>{
+    if(S.epoch!==epoch) return;
+    for(const k of delay.keys()){
+      const el=cellEls[Math.floor(k/n)][k%n];
+      el.classList.remove("zing"); el.style.animationDelay=""; el.style.zIndex="";
+    }
+  }, STEP*(n-1)+700);
 }
 
 /* ================= game flow ================= */
@@ -1005,6 +1057,12 @@ function closeOverlay(id,{restoreFocus=true}={}){
   if(restoreFocus&&returnFocus?.isConnected) requestAnimationFrame(()=>returnFocus.focus());
 }
 
+/* tapping the dimmed background closes the overlay, same as Escape */
+document.addEventListener("click",e=>{
+  const ov=document.querySelector(".overlay.show");
+  if(ov&&e.target===ov) closeOverlay(ov.id);
+});
+
 document.addEventListener("keydown",e=>{
   const ov=document.querySelector(".overlay.show");
   if(!ov) return;
@@ -1024,16 +1082,8 @@ document.addEventListener("keydown",e=>{
   else if(!e.shiftKey&&(active===last||!ov.contains(active))){e.preventDefault();first.focus();}
 });
 
-let tipTimer=null;
-$("starTotal").addEventListener("click",()=>{
-  sndTap();
-  const open=$("starTotal").classList.toggle("tipOpen");
-  clearTimeout(tipTimer);
-  if(open) tipTimer=setTimeout(()=>$("starTotal").classList.remove("tipOpen"),5000);
-});
-document.addEventListener("pointerdown",e=>{
-  if(!$("starTotal").contains(e.target)) $("starTotal").classList.remove("tipOpen");
-});
+$("starTotal").addEventListener("click",()=>{sndTap();openOverlay("starsOv");});
+$("starsClose").addEventListener("click",()=>{sndTap();closeOverlay("starsOv");});
 
 function buildPicker(){
   const wrap=$("levels");
@@ -1066,7 +1116,15 @@ $("noteBtn").addEventListener("click",()=>{
   sndTap();
 });
 $("eraseBtn").addEventListener("click",eraseCell);
-$("newBtn").addEventListener("click",()=>{sndTap();newGame(S.level);});
+$("newBtn").addEventListener("click",()=>{
+  sndTap();
+  /* only ask when there is progress to lose */
+  const touched=!S.done&&S.puz.some((row,r)=>row.some((v,c)=>!S.given[r][c]&&(v>0||S.notes[r][c].size>0)));
+  if(!touched){ newGame(S.level); return; }
+  openOverlay("newOv","#newNo");
+});
+$("newNo").addEventListener("click",()=>{sndTap();closeOverlay("newOv");});
+$("newYes").addEventListener("click",()=>{sndTap();closeOverlay("newOv",{restoreFocus:false});newGame(S.level);requestAnimationFrame(()=>$("newBtn").focus());});
 $("againBtn").addEventListener("click",()=>{sndTap();closeOverlay("winOv",{restoreFocus:false});newGame(S.level);requestAnimationFrame(()=>$("levelBtn").focus());});
 $("winPickBtn").addEventListener("click",()=>{sndTap();closeOverlay("winOv",{restoreFocus:false});buildPicker();openOverlay("pickerOv",".lvl.cur",$("levelBtn"));});
 

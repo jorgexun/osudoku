@@ -9,6 +9,8 @@ no dependencies, no build step.
   top-left button — every puzzle is generated fresh with exactly one solution
 - Pencil notes, cell clear, star rewards, and gentle mistake feedback (wrong
   numbers wiggle away, nothing is ever "game over")
+- Completing a row, column, or box sets off a golden wave with a little
+  sparkle chime; starting over mid-puzzle asks for confirmation first
 - An astronomically accurate solar system background with a tap-to-open
   sky guide (🔭 button)
 - Works offline after the first load (service worker; requires HTTPS —
