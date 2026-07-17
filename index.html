@@ -42,6 +42,14 @@
     height:100dvh;
     padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
+  /* Installed iOS/iPadOS web apps can occasionally expose a canvas taller
+     than 100dvh on launch. Anchor the whole app to the stable large viewport
+     and keep viewport-fixed layers inside that full-height app box. */
+  html.standalone,html.standalone body{height:100vh;height:100lvh;}
+  html.standalone body{position:relative;}
+  html.standalone #space,
+  html.standalone .overlay,
+  html.standalone #confetti{position:absolute;}
   button{
     font-family:inherit;color:inherit;border:0;background:none;cursor:pointer;
     touch-action:manipulation;
@@ -221,8 +229,8 @@
   .cell.given{background:#D8ECFB;color:#1E3B54;font-weight:900;}
   .box.alt .cell.given{background:#CBE4F7;}
   .cell.user{color:var(--grape);}
-  .cell.peer,.box.alt .cell.peer{background:#FFF6DC;}
-  .cell.same,.box.alt .cell.same{background:#FFE9A8;}
+  .cell.peer,.box.alt .cell.peer{background:#FFF9EA;}
+  .cell.same,.box.alt .cell.same{background:#FFF1C7;}
   .cell.sel{
     background:#EFE7FF !important;
     box-shadow:0 0 0 calc(var(--cw,56px)*.07) #8B5CF6, 0 calc(var(--cw,56px)*.055) 0 rgba(43,74,102,.14);
@@ -371,16 +379,6 @@
   .bigBtn.primary:active{box-shadow:0 1px 0 var(--coral-deep);}
 
   /* sky guide */
-  #guideBtn{
-    position:fixed;z-index:3;
-    right:calc(14px + env(safe-area-inset-right));
-    bottom:calc(14px + env(safe-area-inset-bottom));
-    width:54px;height:54px;border-radius:50%;
-    background:var(--tile);font-size:28px;
-    box-shadow:0 5px 0 rgba(0,0,0,.35);
-    transition:transform .08s, box-shadow .08s;
-  }
-  #guideBtn:active{transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.35);}
   #guideCard{text-align:left;}
   #guideCard h2{text-align:center;}
   .fact{
@@ -467,6 +465,7 @@
     </button>
     <button class="chip" id="newBtn" aria-label="New puzzle">🎲</button>
     <button class="chip" id="starTotal" aria-label="Your star collection">⭐ <span id="starCount" aria-live="polite">0</span></button>
+    <button class="chip" id="guideBtn" aria-label="What's in the sky?">🔭</button>
     <button class="chip" id="sndBtn" aria-label="Sound on or off">🔊</button>
   </header>
 
@@ -530,8 +529,6 @@
     </div>
   </div>
 
-  <button id="guideBtn" aria-label="What's in the sky?">🔭</button>
-
   <div class="overlay" id="guideOv" aria-hidden="true" inert>
     <div class="card" id="guideCard" role="dialog" aria-modal="true" aria-labelledby="guideTitle" tabindex="-1">
       <h2 id="guideTitle">What's in the sky? 🔭</h2>
@@ -556,6 +553,12 @@
 
 <script>
 "use strict";
+
+/* iOS exposes navigator.standalone; display-mode covers installed web apps
+   elsewhere and newer iOS versions. Set the class before the first game render. */
+if(navigator.standalone===true||matchMedia("(display-mode: standalone)").matches){
+  document.documentElement.classList.add("standalone");
+}
 
 /* ================= puzzle engine ================= */
 const BOXES = {4:{br:2,bc:2}, 6:{br:2,bc:3}, 9:{br:3,bc:3}};
