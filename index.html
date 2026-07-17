@@ -650,32 +650,69 @@ function makePuzzle(n,targetGivens){
    in the DOM (the always-visible header chip) defines the paint. */
 const SVG=(inner)=>`<svg viewBox="0 0 40 40" width="1em" height="1em" aria-hidden="true">${inner}</svg>`;
 const ICONS={
-  sun:SVG(`<defs><radialGradient id="gsun" cx="40%" cy="38%" r="70%"><stop offset="0" stop-color="#FFF9D6"/><stop offset=".5" stop-color="#FFE45C"/><stop offset="1" stop-color="#FF9D2E"/></radialGradient></defs>
-    <circle cx="20" cy="20" r="18" fill="#FFC93C" opacity=".25"/><circle cx="20" cy="20" r="16" fill="#FFC93C" opacity=".25"/>
-    <circle cx="20" cy="20" r="13" fill="url(#gsun)"/>`),
-  saturn:SVG(`<defs><radialGradient id="gsat" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#F4E5BE"/><stop offset=".55" stop-color="#E2C489"/><stop offset="1" stop-color="#C7A05F"/></radialGradient></defs>
-    <circle cx="20" cy="20" r="10.5" fill="url(#gsat)"/>
-    <g transform="rotate(-19 20 20)" fill="none"><ellipse cx="20" cy="20" rx="14" ry="4" stroke="#E9D4A4" stroke-width="2.4" opacity=".95"/><ellipse cx="20" cy="20" rx="17.5" ry="5.4" stroke="#E9D4A4" stroke-width="1.6" opacity=".6"/></g>`),
-  moon:SVG(`<defs><radialGradient id="gmoo" cx="35%" cy="32%" r="75%"><stop offset="0" stop-color="#F2F0EB"/><stop offset=".55" stop-color="#C9C4BB"/><stop offset="1" stop-color="#8F897F"/></radialGradient></defs>
+  sun:SVG(`<defs><radialGradient id="gsun" cx="40%" cy="38%" r="72%"><stop offset="0" stop-color="#FFFDF0"/><stop offset=".35" stop-color="#FFEE7A"/><stop offset=".75" stop-color="#FFC93C"/><stop offset="1" stop-color="#FF9D2E"/></radialGradient>
+    <radialGradient id="gsunh" cx="50%" cy="50%" r="50%"><stop offset=".5" stop-color="#FFC93C" stop-opacity=".5"/><stop offset=".78" stop-color="#FFC93C" stop-opacity=".18"/><stop offset="1" stop-color="#FFC93C" stop-opacity="0"/></radialGradient></defs>
+    <circle cx="20" cy="20" r="20" fill="url(#gsunh)"/>
+    <circle cx="20" cy="20" r="12.5" fill="url(#gsun)"/>
+    <circle cx="15.5" cy="14.5" r="3" fill="#FFFDF0" opacity=".55"/>`),
+  saturn:SVG(`<defs><radialGradient id="gsat" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#F6E9C4"/><stop offset=".55" stop-color="#E2C489"/><stop offset="1" stop-color="#BC934F"/></radialGradient>
+    <clipPath id="gsatc"><circle cx="20" cy="20" r="10.5"/></clipPath></defs>
+    <g transform="rotate(-19 20 20)">
+      <g fill="none" opacity=".6"><path d="M6 20 A14 4 0 0 0 34 20" stroke="#E9D4A4" stroke-width="2.4"/><path d="M2.5 20 A17.5 5.4 0 0 0 37.5 20" stroke="#D9BE85" stroke-width="1.5"/></g>
+      <circle cx="20" cy="20" r="10.5" fill="url(#gsat)"/>
+      <g clip-path="url(#gsatc)"><rect x="8" y="13.4" width="24" height="2" fill="#C7A05F" opacity=".28"/><rect x="8" y="17" width="24" height="1.4" fill="#C7A05F" opacity=".18"/><rect x="8" y="24.6" width="24" height="2.2" fill="#8A6B3F" opacity=".22"/></g>
+      <g fill="none"><path d="M6 20 A14 4 0 0 1 34 20" stroke="#EED9A9" stroke-width="2.6"/><path d="M2.5 20 A17.5 5.4 0 0 1 37.5 20" stroke="#D9BE85" stroke-width="1.6" opacity=".85"/></g>
+    </g>`),
+  moon:SVG(`<defs><radialGradient id="gmoo" cx="35%" cy="32%" r="75%"><stop offset="0" stop-color="#F4F2ED"/><stop offset=".55" stop-color="#CDC8BF"/><stop offset="1" stop-color="#8F897F"/></radialGradient></defs>
     <circle cx="20" cy="20" r="13" fill="url(#gmoo)"/>
-    <circle cx="24" cy="15" r="3.2" fill="#A9A399" opacity=".8"/><circle cx="14" cy="20" r="2.4" fill="#A9A399" opacity=".7"/><circle cx="21" cy="27" r="2.8" fill="#A9A399" opacity=".75"/><circle cx="15" cy="12" r="1.6" fill="#B4AEA4" opacity=".7"/><circle cx="28" cy="23" r="1.8" fill="#B4AEA4" opacity=".6"/>`),
-  comet:SVG(`<path d="M14 23 L38 2.5 L26 29 Z" fill="#9FC4E8" opacity=".35"/>
-    <path d="M14 25 L35 8 L24 30 Z" fill="#CFE6F8" opacity=".5"/>
-    <defs><radialGradient id="gcom" cx="35%" cy="32%" r="75%"><stop offset="0" stop-color="#F4FAFF"/><stop offset=".55" stop-color="#BFD9EE"/><stop offset="1" stop-color="#7FA3C4"/></radialGradient></defs>
-    <circle cx="13" cy="27" r="5.5" fill="url(#gcom)"/>`),
-  supernova:SVG(`<g stroke="#FFD34D" stroke-width="2.2" stroke-linecap="round"><line x1="20" y1="2" x2="20" y2="7"/><line x1="20" y1="33" x2="20" y2="38"/><line x1="2" y1="20" x2="7" y2="20"/><line x1="33" y1="20" x2="38" y2="20"/><line x1="7.3" y1="7.3" x2="10.8" y2="10.8"/><line x1="29.2" y1="29.2" x2="32.7" y2="32.7"/><line x1="7.3" y1="32.7" x2="10.8" y2="29.2"/><line x1="29.2" y1="10.8" x2="32.7" y2="7.3"/></g>
-    <circle cx="20" cy="20" r="12" stroke="#FF9D2E" stroke-width="2" fill="none" opacity=".8"/>
-    <circle cx="20" cy="20" r="7" fill="#FFE45C" opacity=".55"/><circle cx="20" cy="20" r="4.5" fill="#FFF"/>`),
-  galaxy:SVG(`<g transform="rotate(-15 20 20)"><ellipse cx="20" cy="20" rx="9" ry="5.5" fill="#CFE0FF" opacity=".35"/>
-    <path d="M8 27 Q9 13 24 9.5" stroke="#BFD4FF" stroke-width="2.6" fill="none" opacity=".85" stroke-linecap="round"/>
-    <path d="M32 13 Q31 27 16 30.5" stroke="#BFD4FF" stroke-width="2.6" fill="none" opacity=".85" stroke-linecap="round"/>
-    <ellipse cx="20" cy="20" rx="4.4" ry="2.8" fill="#FFF" opacity=".95"/></g>
-    <circle cx="10" cy="12" r="1" fill="#FFF" opacity=".9"/><circle cx="31" cy="26" r="1" fill="#FFF" opacity=".9"/><circle cx="27" cy="6" r=".8" fill="#FFF" opacity=".7"/>`),
-  quasar:SVG(`<g transform="rotate(-15 20 20)"><path d="M18.4 15 L20 1.5 L21.6 15 Z" fill="#9FD4FF" opacity=".9"/><path d="M18.4 25 L20 38.5 L21.6 25 Z" fill="#9FD4FF" opacity=".9"/>
-    <ellipse cx="20" cy="20" rx="12.5" ry="4.4" fill="#FFB13D" opacity=".85"/><ellipse cx="20" cy="20" rx="6.5" ry="2.3" fill="#FFE9B0"/><circle cx="20" cy="20" r="2.4" fill="#FFF"/></g>`),
-  blackhole:SVG(`<circle cx="20" cy="20" r="10" fill="none" stroke="#FF9D2E" stroke-width="4" opacity=".85"/>
-    <path d="M11 23.5 A10 10 0 0 0 29 23.5" stroke="#FFD34D" stroke-width="4.5" fill="none" stroke-linecap="round"/>
-    <circle cx="20" cy="20" r="7.6" fill="#05070F"/><circle cx="20" cy="20" r="7.6" fill="none" stroke="#FFE9B0" stroke-width=".7" opacity=".8"/>`),
+    <ellipse cx="16" cy="15" rx="5.5" ry="4.5" fill="#9A948A" opacity=".35"/>
+    <ellipse cx="24" cy="22.5" rx="4" ry="3.4" fill="#9A948A" opacity=".28"/>
+    <circle cx="24" cy="14.5" r="3.1" fill="#A29C92" opacity=".9"/><path d="M21.6 15.6 A3.1 3.1 0 0 0 26.4 16.4" stroke="#EAE7E0" stroke-width=".9" fill="none" opacity=".8"/>
+    <circle cx="13.5" cy="21" r="2.3" fill="#A29C92" opacity=".85"/><path d="M11.8 21.9 A2.3 2.3 0 0 0 15.4 22.4" stroke="#EAE7E0" stroke-width=".8" fill="none" opacity=".75"/>
+    <circle cx="21" cy="27" r="2.6" fill="#A29C92" opacity=".85"/><path d="M19 28 A2.6 2.6 0 0 0 23 28.4" stroke="#EAE7E0" stroke-width=".8" fill="none" opacity=".7"/>
+    <circle cx="15" cy="11.5" r="1.4" fill="#ABA59B" opacity=".8"/><circle cx="27.5" cy="24" r="1.5" fill="#ABA59B" opacity=".7"/>`),
+  comet:SVG(`<defs><linearGradient id="gcomd" x1="20%" y1="80%" x2="95%" y2="5%"><stop offset="0" stop-color="#E8F2FC" stop-opacity=".9"/><stop offset=".55" stop-color="#CFE6F8" stop-opacity=".45"/><stop offset="1" stop-color="#CFE6F8" stop-opacity="0"/></linearGradient>
+    <linearGradient id="gcomi" x1="20%" y1="80%" x2="95%" y2="5%"><stop offset="0" stop-color="#9FD4FF" stop-opacity=".9"/><stop offset="1" stop-color="#9FD4FF" stop-opacity="0"/></linearGradient>
+    <radialGradient id="gcom" cx="35%" cy="32%" r="75%"><stop offset="0" stop-color="#F6FBFF"/><stop offset=".55" stop-color="#BFD9EE"/><stop offset="1" stop-color="#7FA3C4"/></radialGradient>
+    <radialGradient id="gcomc" cx="50%" cy="50%" r="50%"><stop offset=".3" stop-color="#DCEEFC" stop-opacity=".65"/><stop offset="1" stop-color="#DCEEFC" stop-opacity="0"/></radialGradient></defs>
+    <path d="M9 24 Q21 19.5 37.5 2.5 Q25.5 12 14.5 30 Z" fill="url(#gcomd)"/>
+    <path d="M13.5 22.5 L37.5 9 L17.5 26 Z" fill="url(#gcomi)"/>
+    <circle cx="12" cy="27.5" r="9" fill="url(#gcomc)"/>
+    <circle cx="12" cy="27.5" r="5.2" fill="url(#gcom)"/>`),
+  supernova:SVG(`<defs><radialGradient id="gsnv" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFF"/><stop offset=".45" stop-color="#FFE45C"/><stop offset="1" stop-color="#FFE45C" stop-opacity="0"/></radialGradient></defs>
+    <g stroke="#FFD34D" stroke-width="2.4" stroke-linecap="round"><line x1="20" y1="1.8" x2="20" y2="7.5"/><line x1="20" y1="32.5" x2="20" y2="38.2"/><line x1="1.8" y1="20" x2="7.5" y2="20"/><line x1="32.5" y1="20" x2="38.2" y2="20"/></g>
+    <g stroke="#FFC93C" stroke-width="2" stroke-linecap="round" opacity=".85"><line x1="8" y1="8" x2="11.2" y2="11.2"/><line x1="28.8" y1="28.8" x2="32" y2="32"/><line x1="8" y1="32" x2="11.2" y2="28.8"/><line x1="28.8" y1="11.2" x2="32" y2="8"/></g>
+    <circle cx="20" cy="20" r="12.2" stroke="#FF9D2E" stroke-width="2.2" fill="none" opacity=".85"/>
+    <circle cx="20" cy="20" r="11" stroke="#FF6F61" stroke-width="1" fill="none" opacity=".4"/>
+    <circle cx="20" cy="20" r="8.5" fill="url(#gsnv)"/>
+    <circle cx="20" cy="20" r="4.2" fill="#FFF"/>`),
+  galaxy:SVG(`<defs><radialGradient id="ggal" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFFDF4"/><stop offset=".5" stop-color="#FFE9B0" stop-opacity=".9"/><stop offset="1" stop-color="#FFE9B0" stop-opacity="0"/></radialGradient></defs>
+    <g transform="rotate(-15 20 20)">
+      <ellipse cx="20" cy="20" rx="13.5" ry="8" fill="#9FBEEA" opacity=".18"/>
+      <path d="M6.5 26.5 Q8 13.5 23 9.2" stroke="#9FBEEA" stroke-width="3.4" fill="none" opacity=".5" stroke-linecap="round"/>
+      <path d="M7.5 25.6 Q9.5 15 22.2 10.2" stroke="#CBDCFF" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M33.5 13.5 Q32 26.5 17 30.8" stroke="#9FBEEA" stroke-width="3.4" fill="none" opacity=".5" stroke-linecap="round"/>
+      <path d="M32.5 14.4 Q30.5 25 17.8 29.8" stroke="#CBDCFF" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <ellipse cx="20" cy="20" rx="5.6" ry="3.6" fill="url(#ggal)"/>
+    </g>
+    <circle cx="10" cy="11" r="1" fill="#FFF" opacity=".9"/><circle cx="31" cy="27" r="1" fill="#FFF" opacity=".9"/><circle cx="28" cy="6.5" r=".8" fill="#FFF" opacity=".7"/><circle cx="8" cy="30" r=".8" fill="#FFF" opacity=".6"/>`),
+  quasar:SVG(`<defs><linearGradient id="gqsj" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#E4F4FF"/><stop offset="1" stop-color="#9FD4FF" stop-opacity="0"/></linearGradient>
+    <linearGradient id="gqsk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E4F4FF"/><stop offset="1" stop-color="#9FD4FF" stop-opacity="0"/></linearGradient>
+    <radialGradient id="gqsd" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFF"/><stop offset=".3" stop-color="#FFE9B0"/><stop offset=".7" stop-color="#FFB13D"/><stop offset="1" stop-color="#F07B3F"/></radialGradient></defs>
+    <g transform="rotate(-15 20 20)">
+      <path d="M17.6 16.5 L20 1 L22.4 16.5 Z" fill="url(#gqsj)"/>
+      <path d="M17.6 23.5 L20 39 L22.4 23.5 Z" fill="url(#gqsk)"/>
+      <ellipse cx="20" cy="20" rx="13" ry="4.6" fill="url(#gqsd)"/>
+      <ellipse cx="20" cy="20" rx="6.2" ry="2.2" fill="#FFE9B0"/>
+      <circle cx="20" cy="20" r="2.3" fill="#FFF"/>
+    </g>`),
+  blackhole:SVG(`<defs><radialGradient id="gbhh" cx="50%" cy="50%" r="50%"><stop offset=".5" stop-color="#FF9D2E" stop-opacity="0"/><stop offset=".62" stop-color="#FF9D2E" stop-opacity=".3"/><stop offset=".95" stop-color="#FF9D2E" stop-opacity="0"/></radialGradient></defs>
+    <circle cx="20" cy="20" r="17" fill="url(#gbhh)"/>
+    <circle cx="20" cy="20" r="10" fill="none" stroke="#FF9D2E" stroke-width="3.4" opacity=".8"/>
+    <path d="M10.2 22.5 A10 10 0 0 0 28.5 24.4" stroke="#FFD34D" stroke-width="4.2" fill="none" stroke-linecap="round"/>
+    <path d="M12 26 A10 10 0 0 0 22 29.9" stroke="#FFF3CE" stroke-width="3" fill="none" stroke-linecap="round" opacity=".9"/>
+    <circle cx="20" cy="20" r="7.4" fill="#05070F"/>
+    <circle cx="20" cy="20" r="7.4" fill="none" stroke="#FFE9B0" stroke-width=".8" opacity=".85"/>`),
 };
 
 const LEVELS=[
