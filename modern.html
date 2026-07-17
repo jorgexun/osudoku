@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#f4f4f2">
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon-modern.png">
 <link rel="icon" type="image/png" href="./apple-touch-icon-modern.png">
-<title>Sudoku — Focus</title>
+<title>Sudoku</title>
 <style>
   :root{
     --canvas:#f4f4f2;
@@ -133,23 +133,13 @@
   .brandMark i:nth-child(8){opacity:.16;}
 
   .brandName{
-    display:flex;
-    flex-direction:column;
-    gap:2px;
+    display:block;
   }
 
   .brandName strong{
     font-size:14px;
     font-weight:750;
     letter-spacing:.18em;
-  }
-
-  .brandName span{
-    color:var(--ink-muted);
-    font-size:10px;
-    font-weight:650;
-    letter-spacing:.14em;
-    text-transform:uppercase;
   }
 
   .toolbar{
@@ -218,7 +208,26 @@
     font-size:13px;
   }
 
-  .caret{margin-left:auto;color:var(--ink-muted);font-size:12px;}
+  .caret{
+    position:relative;
+    flex:none;
+    width:12px;
+    height:12px;
+    margin-left:auto;
+    color:var(--ink-muted);
+  }
+
+  .caret::before{
+    content:"";
+    position:absolute;
+    left:1px;
+    top:0;
+    width:6px;
+    height:6px;
+    border:solid currentColor;
+    border-width:0 2px 2px 0;
+    transform:rotate(45deg);
+  }
   .toolGlyph{font-size:18px;font-weight:400;line-height:1;}
   #starTotal strong{font-variant-numeric:tabular-nums;}
 
@@ -300,7 +309,6 @@
     z-index:31;
     background:var(--danger-soft) !important;
     color:var(--danger) !important;
-    box-shadow:inset 0 0 0 3px rgba(197,59,76,.52);
     animation:shake .38s;
   }
 
@@ -308,7 +316,6 @@
     z-index:32;
     background:var(--danger-soft) !important;
     color:var(--danger) !important;
-    box-shadow:inset 0 0 0 3px rgba(197,59,76,.52);
     animation:conflictPulse .72s ease-out;
   }
 
@@ -532,7 +539,7 @@
     letter-spacing:-.025em;
   }
 
-  .cardDescription,#winSub,#newSub,#starsSub{
+  #winSub,#newSub,#starsSub{
     color:var(--ink-muted);
     font-size:14px;
     line-height:1.55;
@@ -720,6 +727,8 @@
     #controls{width:auto;max-width:390px;}
     #pad{display:grid;}
     body.s9 #pad{grid-template-columns:repeat(3,minmax(52px,68px));}
+    #actions{align-self:stretch;}
+    #actions .actionBtn{flex:1;}
   }
 
   @media (prefers-reduced-motion:reduce){
@@ -741,7 +750,6 @@
         </span>
         <span class="brandName">
           <strong>SUDOKU</strong>
-          <span>Focus mode</span>
         </span>
       </div>
 
@@ -751,7 +759,7 @@
           <span class="levelCopy">
             <strong id="levelName">Medium</strong>
           </span>
-          <span class="caret" aria-hidden="true">⌄</span>
+          <span class="caret" aria-hidden="true"></span>
         </button>
         <button class="toolBtn" id="newBtn" aria-label="New puzzle">
           <span class="toolGlyph" aria-hidden="true">↻</span>
@@ -796,7 +804,6 @@
     <div class="card" role="dialog" aria-modal="true" aria-labelledby="pickerTitle" tabindex="-1">
       <div class="cardEyebrow">New puzzle</div>
       <h2 id="pickerTitle">Choose a difficulty</h2>
-      <p class="cardDescription">Every puzzle is generated fresh and has exactly one solution.</p>
       <div id="levels"></div>
       <div class="cardBtns">
         <button class="bigBtn" id="pickerClose">Cancel</button>
