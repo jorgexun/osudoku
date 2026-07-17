@@ -1,12 +1,12 @@
 /* Osudoku service worker — cache-first with background refresh.
-   The game is a single page; once loaded it works fully offline.
-   index.html is re-fetched in the background on every online visit,
+   Both game pages are self-contained; once loaded they work fully offline.
+   Each page is re-fetched in the background on every online visit,
    so updates arrive on the next launch without a version bump here.
    Bump the cache name only if the set of cached URLs changes. */
 "use strict";
 
-const CACHE = "osudoku-v1";
-const ASSETS = ["./", "./index.html", "./sw.js"];
+const CACHE = "osudoku-v2";
+const ASSETS = ["./", "./index.html", "./modern.html", "./sw.js"];
 
 self.addEventListener("install", e => {
   e.waitUntil(
