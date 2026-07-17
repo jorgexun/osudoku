@@ -663,6 +663,13 @@ const ICONS={
       <g clip-path="url(#gsatc)"><rect x="8" y="13.4" width="24" height="2" fill="#C7A05F" opacity=".28"/><rect x="8" y="17" width="24" height="1.4" fill="#C7A05F" opacity=".18"/><rect x="8" y="24.6" width="24" height="2.2" fill="#8A6B3F" opacity=".22"/></g>
       <g fill="none"><path d="M6 20 A14 4 0 0 1 34 20" stroke="#EED9A9" stroke-width="2.6"/><path d="M2.5 20 A17.5 5.4 0 0 1 37.5 20" stroke="#D9BE85" stroke-width="1.6" opacity=".85"/></g>
     </g>`),
+  reddwarf:SVG(`<defs><radialGradient id="grdw" cx="40%" cy="38%" r="72%"><stop offset="0" stop-color="#FFE0B8"/><stop offset=".4" stop-color="#FF9A57"/><stop offset=".8" stop-color="#E85B2E"/><stop offset="1" stop-color="#C4441F"/></radialGradient>
+    <radialGradient id="grdwh" cx="50%" cy="50%" r="50%"><stop offset=".45" stop-color="#FF7A3C" stop-opacity=".45"/><stop offset="1" stop-color="#FF7A3C" stop-opacity="0"/></radialGradient></defs>
+    <circle cx="20" cy="20" r="16" fill="url(#grdwh)"/>
+    <circle cx="20" cy="20" r="9" fill="url(#grdw)"/>
+    <circle cx="16.5" cy="16" r="2.2" fill="#FFE0B8" opacity=".5"/>
+    <circle cx="23" cy="21.5" r="1.5" fill="#A83818" opacity=".5"/>
+    <circle cx="17.5" cy="23" r="1.1" fill="#A83818" opacity=".45"/>`),
   moon:SVG(`<defs><radialGradient id="gmoo" cx="35%" cy="32%" r="75%"><stop offset="0" stop-color="#F4F2ED"/><stop offset=".55" stop-color="#CDC8BF"/><stop offset="1" stop-color="#8F897F"/></radialGradient></defs>
     <circle cx="20" cy="20" r="13" fill="url(#gmoo)"/>
     <ellipse cx="16" cy="15" rx="5.5" ry="4.5" fill="#9A948A" opacity=".35"/>
@@ -719,6 +726,7 @@ const LEVELS=[
   {icon:"moon",     name:"Moon",      size:4,givens:12,sz:"4 × 4"},
   {icon:"comet",    name:"Comet",     size:4,givens:8, sz:"4 × 4"},
   {icon:"saturn",   name:"Planet",    size:6,givens:18,sz:"6 × 6"},
+  {icon:"reddwarf", name:"Red Dwarf", size:6,givens:14,sz:"6 × 6"},
   {icon:"sun",      name:"Sun",       size:9,givens:44,sz:"9 × 9"},
   {icon:"supernova",name:"Supernova", size:9,givens:38,sz:"9 × 9"},
   {icon:"galaxy",   name:"Galaxy",    size:9,givens:32,sz:"9 × 9"},
@@ -743,7 +751,7 @@ const store={
   }
   d.best  = best;
   d.total = Math.max(0,Math.floor(Number(d.total)||0));
-  d.level = LEVELS[d.level] ? d.level : 4;
+  d.level = LEVELS[d.level] ? d.level : 5; /* fresh installs start at Supernova */
   d.sound = d.sound!==false;
 }
 

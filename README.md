@@ -5,7 +5,7 @@ no dependencies, no build step.
 
 **[Play Osudoku](https://pencilsmith.com/osudoku/)**
 
-- 8 difficulty levels from 🌑 Moon (4×4) to Black Hole (9×9), picked via the
+- 9 difficulty levels from 🌑 Moon (4×4) to Black Hole (9×9), picked via the
   top-left button — every puzzle is generated fresh with exactly one solution
 - Pencil notes, cell clear, star rewards, and gentle mistake feedback (wrong
   numbers wiggle away, nothing is ever "game over")
