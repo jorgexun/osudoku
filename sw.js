@@ -5,8 +5,15 @@
    Bump the cache name only if the set of cached URLs changes. */
 "use strict";
 
-const CACHE = "osudoku-v2";
-const ASSETS = ["./", "./index.html", "./modern.html", "./sw.js"];
+const CACHE = "osudoku-v3";
+const ASSETS = [
+  "./",
+  "./index.html",
+  "./modern.html",
+  "./apple-touch-icon.png",
+  "./apple-touch-icon-modern.png",
+  "./sw.js"
+];
 
 self.addEventListener("install", e => {
   e.waitUntil(

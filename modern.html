@@ -8,6 +8,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Sudoku">
 <meta name="theme-color" content="#f4f4f2">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon-modern.png">
+<link rel="icon" type="image/png" href="./apple-touch-icon-modern.png">
 <title>Sudoku — Focus</title>
 <style>
   :root{
@@ -204,9 +206,8 @@
     min-width:0;
     display:flex;
     flex:1;
-    flex-direction:column;
-    align-items:flex-start;
-    line-height:1.1;
+    align-items:center;
+    line-height:1;
   }
 
   .levelCopy strong{
@@ -215,13 +216,6 @@
     text-overflow:ellipsis;
     white-space:nowrap;
     font-size:13px;
-  }
-
-  .levelCopy small{
-    margin-top:3px;
-    color:var(--ink-muted);
-    font-size:10px;
-    font-weight:600;
   }
 
   .caret{margin-left:auto;color:var(--ink-muted);font-size:12px;}
@@ -544,7 +538,6 @@
     grid-template-columns:auto 1fr;
     grid-template-areas:
       "face name"
-      "face size"
       "best best";
     column-gap:10px;
     text-align:left;
@@ -555,8 +548,7 @@
   .lvl.cur{border-color:var(--accent);background:var(--accent-soft);}
   .lvl .face{grid-area:face;align-self:center;}
   .lvl .face .levelMark{width:32px;height:32px;}
-  .lvl .nm{grid-area:name;align-self:end;font-size:13px;font-weight:700;}
-  .lvl .sz{grid-area:size;align-self:start;color:var(--ink-muted);font-size:10px;font-weight:600;}
+  .lvl .nm{grid-area:name;align-self:center;font-size:13px;font-weight:700;}
   .lvl .best{
     grid-area:best;
     margin-top:11px;
@@ -725,7 +717,6 @@
           <span id="levelFace"><span class="levelMark">02</span></span>
           <span class="levelCopy">
             <strong id="levelName">Medium</strong>
-            <small id="levelSize">9 × 9</small>
           </span>
           <span class="caret" aria-hidden="true">⌄</span>
         </button>
@@ -929,10 +920,10 @@ const ICONS={
 };
 
 const LEVELS=[
-  {key:"Sun",icon:"sun",name:"Easy",size:9,givens:44,sz:"9 × 9"},
-  {key:"Supernova",icon:"supernova",name:"Medium",size:9,givens:38,sz:"9 × 9"},
-  {key:"Galaxy",icon:"galaxy",name:"Hard",size:9,givens:32,sz:"9 × 9"},
-  {key:"Black Hole",icon:"blackhole",name:"Expert",size:9,givens:24,sz:"9 × 9"}
+  {key:"Sun",icon:"sun",name:"Easy",size:9,givens:44},
+  {key:"Supernova",icon:"supernova",name:"Medium",size:9,givens:38},
+  {key:"Galaxy",icon:"galaxy",name:"Hard",size:9,givens:32},
+  {key:"Black Hole",icon:"blackhole",name:"Expert",size:9,givens:24}
 ];
 
 const PRAISE=["Puzzle complete.","Solved.","Well played.","Excellent solve.","Grid complete."];
@@ -1299,7 +1290,6 @@ function newGame(levelIdx){
   S.epoch++;
   $("levelFace").innerHTML=ICONS[L.icon];
   $("levelName").textContent=L.name;
-  $("levelSize").textContent=L.sz;
   $("statusText").textContent=L.name+" puzzle ready.";
   buildBoard();
   buildPad();
@@ -1439,9 +1429,8 @@ function buildPicker(){
     const best=store.data.best[L.key]||0;
     b.innerHTML='<span class="face">'+ICONS[L.icon]+'</span>'+
       '<span class="nm">'+L.name+'</span>'+
-      '<span class="sz">'+L.sz+'</span>'+
       '<span class="best">'+("●".repeat(best))+("○".repeat(3-best))+'</span>';
-    b.setAttribute("aria-label",L.name+", "+L.sz+", best score "+best+" out of 3");
+    b.setAttribute("aria-label",L.name+", best score "+best+" out of 3");
     b.addEventListener("click",()=>{
       sndTap();
       closeOverlay("pickerOv");
