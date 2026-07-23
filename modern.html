@@ -675,6 +675,10 @@
     to{transform:translate(var(--x,0),112vh) rotate(var(--r,360deg));}
   }
 
+  @media (min-width:761px) and (orientation:portrait){
+    .gameShell{gap:clamp(40px,5dvh,64px);}
+  }
+
   @media (max-width:760px){
     .headerInner{min-height:62px;padding:8px 12px;gap:10px;}
     .brandName{display:none;}
