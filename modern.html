@@ -978,8 +978,17 @@ const LEVELS=[
 
 const PRAISE=["Puzzle complete.","Solved.","Well played.","Excellent solve.","Grid complete."];
 
+const isPlainObject=value=>value!==null&&typeof value==="object"&&!Array.isArray(value);
+
 const store={
-  data:(()=>{try{return JSON.parse(localStorage.getItem("osudoku"))||{};}catch(e){return {};}})(),
+  data:(()=>{
+    try{
+      const value=JSON.parse(localStorage.getItem("osudoku"));
+      return isPlainObject(value)?value:{};
+    }catch(e){
+      return {};
+    }
+  })(),
   save(){try{localStorage.setItem("osudoku",JSON.stringify(this.data));}catch(e){}}
 };
 
@@ -1009,6 +1018,104 @@ const S={
   sel:null,rejections:0,done:false,noteMode:false,
   epoch:0,conflictTimer:null
 };
+
+const GAME_SAVE_KEY="osudoku-modern-game";
+const GAME_SAVE_VERSION=1;
+
+function isMatrix(value,n,test){
+  return Array.isArray(value)&&value.length===n&&
+    value.every(row=>Array.isArray(row)&&row.length===n&&row.every(test));
+}
+
+function hasGridConflicts(grid,n){
+  const {br,bc}=BOXES[n],boxCols=n/bc;
+  const rows=Array.from({length:n},()=>new Set());
+  const cols=Array.from({length:n},()=>new Set());
+  const boxes=Array.from({length:n},()=>new Set());
+  for(let r=0;r<n;r++) for(let c=0;c<n;c++){
+    const v=grid[r][c];
+    if(!v) continue;
+    const b=Math.floor(r/br)*boxCols+Math.floor(c/bc);
+    if(rows[r].has(v)||cols[c].has(v)||boxes[b].has(v)) return true;
+    rows[r].add(v);
+    cols[c].add(v);
+    boxes[b].add(v);
+  }
+  return false;
+}
+
+function decodeSavedGame(value){
+  const n=9;
+  if(!isPlainObject(value)||
+    value.schemaVersion!==GAME_SAVE_VERSION||
+    !Number.isInteger(value.level)||
+    value.level<0||value.level>=LEVELS.length||
+    !Number.isSafeInteger(value.rejections)||
+    value.rejections<0) return null;
+  if(!isMatrix(value.puz,n,v=>Number.isInteger(v)&&v>=0&&v<=n)||
+    !isMatrix(value.given,n,v=>typeof v==="boolean")||
+    !isMatrix(value.notes,n,v=>Array.isArray(v))) return null;
+  if(value.puz.every(row=>row.every(Boolean))||hasGridConflicts(value.puz,n)) return null;
+
+  const notes=[];
+  for(let r=0;r<n;r++){
+    notes.push([]);
+    for(let c=0;c<n;c++){
+      const list=value.notes[r][c];
+      if(value.given[r][c]&&!value.puz[r][c]) return null;
+      if(value.puz[r][c]&&list.length) return null;
+      if(list.some(v=>!Number.isInteger(v)||v<1||v>n)||
+        new Set(list).size!==list.length) return null;
+      notes[r].push(new Set(list));
+    }
+  }
+  const clueGrid=value.puz.map((row,r)=>row.map((v,c)=>value.given[r][c]?v:0));
+  if(countSolutions(clueGrid,n,2)!==1) return null;
+
+  return {
+    level:value.level,
+    n,
+    puz:value.puz.map(row=>row.slice()),
+    given:value.given.map(row=>row.slice()),
+    notes,
+    rejections:value.rejections
+  };
+}
+
+function clearSavedGame(){
+  try{localStorage.removeItem(GAME_SAVE_KEY);}catch(e){}
+}
+
+function loadSavedGame(){
+  try{
+    const raw=localStorage.getItem(GAME_SAVE_KEY);
+    if(!raw) return null;
+    const game=decodeSavedGame(JSON.parse(raw));
+    if(!game) clearSavedGame();
+    return game;
+  }catch(e){
+    clearSavedGame();
+    return null;
+  }
+}
+
+function saveCurrentGame(){
+  if(S.done){
+    clearSavedGame();
+    return;
+  }
+  if(S.puz.length!==S.n||S.given.length!==S.n||S.notes.length!==S.n) return;
+  const value={
+    schemaVersion:GAME_SAVE_VERSION,
+    savedAt:Date.now(),
+    level:S.level,
+    puz:S.puz.map(row=>row.slice()),
+    given:S.given.map(row=>row.slice()),
+    notes:S.notes.map(row=>row.map(set=>[...set].sort((a,b)=>a-b))),
+    rejections:S.rejections
+  };
+  try{localStorage.setItem(GAME_SAVE_KEY,JSON.stringify(value));}catch(e){}
+}
 
 const UNIT_STEP_MS=42;
 const UNIT_ANIMATION_MS=480;
@@ -1217,6 +1324,7 @@ function tapPad(v,btn){
     sndTap();
     refreshCell(r,c);
     $("statusText").textContent="Candidate "+v+(set.has(v)?" added.":" removed.");
+    saveCurrentGame();
     return;
   }
   const el=cellEls[r][c];
@@ -1238,9 +1346,11 @@ function tapPad(v,btn){
     updateHighlights();
     $("statusText").textContent=v+" entered.";
     checkWin();
+    if(!S.done) saveCurrentGame();
     celebrateUnits(r,c);
   }else{
     S.rejections++;
+    saveCurrentGame();
     sndBad();
     const reasons=new Set();
     const {br,bc}=BOXES[S.n];
@@ -1280,6 +1390,7 @@ function eraseCell(){
   updatePad();
   updateHighlights();
   $("statusText").textContent="Cell cleared.";
+  saveCurrentGame();
 }
 
 function clearNotesAround(r,c,v){
@@ -1333,14 +1444,23 @@ function celebrateUnits(r,c){
 }
 
 /* ================= game flow ================= */
+function renderGame(status){
+  const L=LEVELS[S.level];
+  $("levelFace").innerHTML=ICONS[L.icon];
+  $("levelName").textContent=L.name;
+  $("statusText").textContent=status;
+  buildBoard();
+  buildPad();
+  refreshAll();
+  requestAnimationFrame(fitFont);
+}
+
 function newGame(levelIdx){
   clearConflictFeedback();
-  S.level=levelIdx;
-  store.data.modernLevel=levelIdx;
-  store.save();
   const L=LEVELS[levelIdx];
-  S.n=L.size;
   const {puz}=makePuzzle(L.size,L.givens);
+  S.level=levelIdx;
+  S.n=L.size;
   S.puz=puz;
   S.given=puz.map(row=>row.map(v=>v>0));
   S.notes=puz.map(row=>row.map(()=>new Set()));
@@ -1348,13 +1468,26 @@ function newGame(levelIdx){
   S.rejections=0;
   S.done=false;
   S.epoch++;
-  $("levelFace").innerHTML=ICONS[L.icon];
-  $("levelName").textContent=L.name;
-  $("statusText").textContent=L.name+" puzzle ready.";
-  buildBoard();
-  buildPad();
-  refreshAll();
-  requestAnimationFrame(fitFont);
+  store.data.modernLevel=levelIdx;
+  store.save();
+  saveCurrentGame();
+  renderGame(L.name+" puzzle ready.");
+}
+
+function restoreGame(game){
+  clearConflictFeedback();
+  S.level=game.level;
+  S.n=game.n;
+  S.puz=game.puz;
+  S.given=game.given;
+  S.notes=game.notes;
+  S.sel=null;
+  S.rejections=game.rejections;
+  S.done=false;
+  S.epoch++;
+  store.data.modernLevel=game.level;
+  store.save();
+  renderGame(LEVELS[game.level].name+" puzzle restored.");
 }
 
 function checkWin(){
@@ -1368,6 +1501,7 @@ function checkWin(){
   store.data.best[key]=Math.max(store.data.best[key]||0,stars);
   store.data.total+=stars;
   store.save();
+  clearSavedGame();
   updateStarTotal();
   const epoch=S.epoch;
   const winDelay=UNIT_STEP_MS*(S.n-1)+UNIT_ANIMATION_MS+WIN_GAP_MS;
@@ -1561,6 +1695,7 @@ $("sndBtn").addEventListener("click",()=>{
 });
 
 document.addEventListener("pointerdown",()=>audio(),{once:true});
+window.addEventListener("pagehide",saveCurrentGame);
 
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("sw.js").catch(()=>{});
@@ -1569,7 +1704,8 @@ if("serviceWorker" in navigator){
 /* ================= boot ================= */
 updateSoundButton();
 updateStarTotal();
-newGame(S.level);
+const savedGame=loadSavedGame();
+savedGame?restoreGame(savedGame):newGame(S.level);
 </script>
 </body>
 </html>

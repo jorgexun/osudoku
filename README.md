@@ -36,8 +36,9 @@ In Safari on the iPad, with the game open:
 2. Tap **Add to Home Screen**, then **Add**.
 
 That gives it a home-screen icon and launches it full screen, without
-Safari's address bar. Progress (stars, best scores, last level) is saved
-on the iPad automatically.
+Safari's address bar. The current puzzle, candidate notes, rejected-entry
+count, stars, best scores, and last level are saved on the iPad automatically.
+An unfinished puzzle resumes on the next launch.
 
 ## Offline play
 
