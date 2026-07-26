@@ -1,11 +1,11 @@
 /* Osudoku service worker — cache-first with background refresh.
    Both game pages are self-contained; once loaded they work fully offline.
-   Each page is re-fetched in the background on every online visit,
-   so updates arrive on the next launch without a version bump here.
-   Bump the cache name only if the set of cached URLs changes. */
+   Bump VERSION for every release so its assets are staged together in a
+   fresh cache. The current cache remains available while that happens. */
 "use strict";
 
-const CACHE = "osudoku-v3";
+const VERSION = "4";
+const CACHE = `osudoku-v${VERSION}`;
 const ASSETS = [
   "./",
   "./index.html",

@@ -44,7 +44,9 @@ on the iPad automatically.
 The hosted game uses HTTPS, so a service worker caches it on the first load.
 After that it launches and plays with no internet at all (airplane mode, road
 trips). Updates take care of themselves: the next online launch downloads the
-new version in the background, and the launch after that runs it.
+new version into a release-specific cache in the background, and the launch
+after that runs it. If the update cannot finish, the current cache remains
+available.
 
 To verify: load the game once online, enable Airplane Mode, and launch it
 again — it should come up instantly.
