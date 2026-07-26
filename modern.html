@@ -1130,8 +1130,11 @@ function updateHighlights(){
       continue;
     }
     const sameBox=Math.floor(r/br)===Math.floor(sr/br)&&Math.floor(c/bc)===Math.floor(sc/bc);
-    if(sv&&S.puz[r][c]===sv) el.classList.add("same");
-    else if(r===sr||c===sc||sameBox) el.classList.add("peer");
+    if(sv){
+      if(S.puz[r][c]===sv) el.classList.add("same");
+    }else if(r===sr||c===sc||sameBox){
+      el.classList.add("peer");
+    }
   }
 }
 
