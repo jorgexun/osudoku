@@ -289,18 +289,18 @@
   }
 
   .cell.given{
-    background:#f1f1ef;
+    background:#f5f5f3;
     color:#16171a;
     font-weight:760;
   }
 
   .cell.user{color:var(--accent);font-weight:660;}
-  .cell.peer{background:#f3f4fc;}
-  .cell.same{background:#e7e9fb;}
+  .cell.peer{background:#f0f2fb;}
+  .cell.same{background:#d7dcfa;}
 
   .cell.sel{
     z-index:30;
-    background:#dce0ff !important;
+    background:#c7ceff !important;
   }
 
   .cell.pop span{animation:pop .26s ease-out;}
@@ -1130,11 +1130,8 @@ function updateHighlights(){
       continue;
     }
     const sameBox=Math.floor(r/br)===Math.floor(sr/br)&&Math.floor(c/bc)===Math.floor(sc/bc);
-    if(sv){
-      if(S.puz[r][c]===sv) el.classList.add("same");
-    }else if(r===sr||c===sc||sameBox){
-      el.classList.add("peer");
-    }
+    if(sv&&S.puz[r][c]===sv) el.classList.add("same");
+    else if(r===sr||c===sc||sameBox) el.classList.add("peer");
   }
 }
 
