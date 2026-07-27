@@ -4,7 +4,7 @@
    fresh cache. The current cache remains available while that happens. */
 "use strict";
 
-const VERSION = "5";
+const VERSION = "7";
 const CACHE = `osudoku-v${VERSION}`;
 const ASSETS = [
   "./",
