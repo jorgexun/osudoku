@@ -1,17 +1,16 @@
 /* Osudoku service worker — cache-first with background refresh.
-   Both game pages are self-contained; once loaded they work fully offline.
+   The game is self-contained; once loaded it works fully offline.
    Bump VERSION for every release so its assets are staged together in a
    fresh cache. The current cache remains available while that happens. */
 "use strict";
 
-const VERSION = "7";
-const CACHE = `osudoku-v${VERSION}`;
+const VERSION = "8";
+const CACHE_PREFIX = "osudoku-v";
+const CACHE = `${CACHE_PREFIX}${VERSION}`;
 const ASSETS = [
   "./",
   "./index.html",
-  "./modern.html",
   "./apple-touch-icon.png",
-  "./apple-touch-icon-modern.png",
   "./sw.js"
 ];
 
@@ -24,7 +23,11 @@ self.addEventListener("install", e => {
 self.addEventListener("activate", e => {
   e.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(keys => Promise.all(
+        keys
+          .filter(k => k.startsWith(CACHE_PREFIX) && k !== CACHE)
+          .map(k => caches.delete(k))
+      ))
       .then(() => self.clients.claim())
   );
 });

@@ -1,14 +1,9 @@
 # Osudoku 🪐
 
 A kid-friendly, solar-system-themed Sudoku game for iPad. The original version
-lives in one file (`index.html`), with no dependencies or build step.
-
-The repository also includes `modern.html`, a visually restrained version for
-adult players. It offers four standard 9×9 difficulty levels with the same notes,
-scoring, sound, feedback, dialogs, saved progress, and offline support while
-replacing the space theme and playful imagery with a clean, neutral interface.
-Entries are validated against the current row, column, and box rather than the
-generated solution; rejected entries highlight every visible conflict.
+lives in one file (`index.html`), with no dependencies or build step. The modern
+edition is maintained separately in
+[jorgexun/sudoku](https://github.com/jorgexun/sudoku).
 
 **[Play Osudoku](https://pencilsmith.com/osudoku/)**
 
@@ -54,9 +49,8 @@ again — it should come up instantly.
 
 ## Development
 
-Each version is self-contained in its own HTML file (`index.html` and
-`modern.html`). There is no build step; clone the repository and serve it with
-any static server:
+The game is self-contained in `index.html`. There is no build step; clone the
+repository and serve it with any static server:
 
 ```sh
 git clone https://github.com/jorgexun/osudoku.git
@@ -64,4 +58,4 @@ cd osudoku
 python3 -m http.server 8642
 ```
 
-Open `http://localhost:8642/modern.html` for the modern interface.
+Open `http://localhost:8642/`.
