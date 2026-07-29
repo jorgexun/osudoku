@@ -1,56 +1,19 @@
 # Osudoku 🪐
 
-A kid-friendly, solar-system-themed Sudoku game for iPad. The original version
-lives in one file (`index.html`), with no dependencies or build step. The modern
-edition is maintained separately in
-[jorgexun/sudoku](https://github.com/jorgexun/sudoku).
+A kid-friendly, solar-system-themed Sudoku game.
 
 **[Play Osudoku](https://pencilsmith.com/osudoku/)**
 
-- 9 difficulty levels from 🌑 Moon (4×4) to Black Hole (9×9), picked via the
-  top-left button — every puzzle is generated fresh with exactly one solution
-- Pencil notes, cell clear, star rewards, and gentle mistake feedback (wrong
-  numbers wiggle away, nothing is ever "game over")
-- Completing a row, column, or box sets off a golden wave with a little
-  sparkle chime; starting over mid-puzzle asks for confirmation first
-- An astronomically accurate solar system background with a tap-to-open
-  sky guide (🔭 button)
-- Works offline after the first load (service worker; requires HTTPS —
-  see below)
+- 9 difficulty levels, from 4×4 to 9×9
+- Fresh puzzles with a unique solution
+- Notes, scoring, sound, and saved progress
+- Offline play after the first visit
 
-## Play on iPad
+For the minimal edition, see [Sudoku](https://github.com/jorgexun/sudoku).
 
-Open [pencilsmith.com/osudoku](https://pencilsmith.com/osudoku/) in Safari.
-The game is hosted with GitHub Pages and works anywhere.
+## Run locally
 
-### Make it feel like a real app
-
-In Safari on the iPad, with the game open:
-
-1. Tap the **Share** button (square with an arrow).
-2. Tap **Add to Home Screen**, then **Add**.
-
-That gives it a home-screen icon and launches it full screen, without
-Safari's address bar. The current puzzle, candidate notes, rejected-entry
-count, stars, best scores, and last level are saved on the iPad automatically.
-An unfinished puzzle resumes on the next launch.
-
-## Offline play
-
-The hosted game uses HTTPS, so a service worker caches it on the first load.
-After that it launches and plays with no internet at all (airplane mode, road
-trips). Updates take care of themselves: the next online launch downloads the
-new version into a release-specific cache in the background, and the launch
-after that runs it. If the update cannot finish, the current cache remains
-available.
-
-To verify: load the game once online, enable Airplane Mode, and launch it
-again — it should come up instantly.
-
-## Development
-
-The game is self-contained in `index.html`. There is no build step; clone the
-repository and serve it with any static server:
+The game is self-contained in `index.html` and has no build step:
 
 ```sh
 git clone https://github.com/jorgexun/osudoku.git
@@ -58,4 +21,4 @@ cd osudoku
 python3 -m http.server 8642
 ```
 
-Open `http://localhost:8642/`.
+Then open `http://localhost:8642/`.
